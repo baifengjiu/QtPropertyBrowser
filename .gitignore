@@ -1,0 +1,5 @@
+﻿/CMakeSettings.json
+.vs
+out
+[Bb]uild
+*.user
