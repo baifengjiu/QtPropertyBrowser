@@ -41,6 +41,7 @@
 #include <QApplication>
 #include <QDate>
 #include <QLocale>
+#include <QLineEdit>
 #include "qtpropertymanager.h"
 #include "qtvariantproperty.h"
 #include "qttreepropertybrowser.h"

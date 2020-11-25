@@ -1,53 +1,48 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc and/or its subsidiary(-ies).
-** Contact: http://www.qt-project.org/legal
+** Copyright (C) 2016 The Qt Company Ltd.
+** Contact: https://www.qt.io/licensing/
 **
-** This file is part of the Qt Solutions component.
+** This file is part of the tools applications of the Qt Toolkit.
 **
-** $QT_BEGIN_LICENSE:BSD$
-** You may use this file under the terms of the BSD license as follows:
+** $QT_BEGIN_LICENSE:LGPL$
+** Commercial License Usage
+** Licensees holding valid commercial Qt licenses may use this file in
+** accordance with the commercial license agreement provided with the
+** Software or, alternatively, in accordance with the terms contained in
+** a written agreement between you and The Qt Company. For licensing terms
+** and conditions see https://www.qt.io/terms-conditions. For further
+** information use the contact form at https://www.qt.io/contact-us.
 **
-** "Redistribution and use in source and binary forms, with or without
-** modification, are permitted provided that the following conditions are
-** met:
-**   * Redistributions of source code must retain the above copyright
-**     notice, this list of conditions and the following disclaimer.
-**   * Redistributions in binary form must reproduce the above copyright
-**     notice, this list of conditions and the following disclaimer in
-**     the documentation and/or other materials provided with the
-**     distribution.
-**   * Neither the name of Digia Plc and its Subsidiary(-ies) nor the names
-**     of its contributors may be used to endorse or promote products derived
-**     from this software without specific prior written permission.
+** GNU Lesser General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU Lesser
+** General Public License version 3 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL3 included in the
+** packaging of this file. Please review the following information to
+** ensure the GNU Lesser General Public License version 3 requirements
+** will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
 **
-**
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-** "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-** LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-** A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-** OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-** SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-** LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-** DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-** THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU
+** General Public License version 2.0 or (at your option) the GNU General
+** Public license version 3 or any later version approved by the KDE Free
+** Qt Foundation. The licenses are as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL2 and LICENSE.GPL3
+** included in the packaging of this file. Please review the following
+** information to ensure the GNU General Public License requirements will
+** be met: https://www.gnu.org/licenses/gpl-2.0.html and
+** https://www.gnu.org/licenses/gpl-3.0.html.
 **
 ** $QT_END_LICENSE$
 **
 ****************************************************************************/
 
-
 #ifndef QTPROPERTYMANAGER_H
 #define QTPROPERTYMANAGER_H
 
 #include "qtpropertybrowser.h"
-#include <QLineEdit>
 
-#if QT_VERSION >= 0x040400
 QT_BEGIN_NAMESPACE
-#endif
 
 class QDate;
 class QTime;
@@ -74,7 +69,6 @@ class QT_QTPROPERTYBROWSER_EXPORT QtIntPropertyManager : public QtAbstractProper
 {
     Q_OBJECT
 public:
-	typedef int value_type;
     QtIntPropertyManager(QObject *parent = 0);
     ~QtIntPropertyManager();
 
@@ -82,7 +76,6 @@ public:
     int minimum(const QtProperty *property) const;
     int maximum(const QtProperty *property) const;
     int singleStep(const QtProperty *property) const;
-    bool isReadOnly(const QtProperty *property) const;
 
 public Q_SLOTS:
     void setValue(QtProperty *property, int val);
@@ -90,20 +83,18 @@ public Q_SLOTS:
     void setMaximum(QtProperty *property, int maxVal);
     void setRange(QtProperty *property, int minVal, int maxVal);
     void setSingleStep(QtProperty *property, int step);
-    void setReadOnly(QtProperty *property, bool readOnly);
 Q_SIGNALS:
     void valueChanged(QtProperty *property, int val);
     void rangeChanged(QtProperty *property, int minVal, int maxVal);
     void singleStepChanged(QtProperty *property, int step);
-    void readOnlyChanged(QtProperty *property, bool readOnly);
 protected:
     QString valueText(const QtProperty *property) const;
     virtual void initializeProperty(QtProperty *property);
     virtual void uninitializeProperty(QtProperty *property);
 private:
-    QtIntPropertyManagerPrivate *d_ptr;
+    QScopedPointer<QtIntPropertyManagerPrivate> d_ptr;
     Q_DECLARE_PRIVATE(QtIntPropertyManager)
-    Q_DISABLE_COPY(QtIntPropertyManager)
+    Q_DISABLE_COPY_MOVE(QtIntPropertyManager)
 };
 
 class QtBoolPropertyManagerPrivate;
@@ -112,28 +103,24 @@ class QT_QTPROPERTYBROWSER_EXPORT QtBoolPropertyManager : public QtAbstractPrope
 {
     Q_OBJECT
 public:
-	typedef bool value_type;
     QtBoolPropertyManager(QObject *parent = 0);
     ~QtBoolPropertyManager();
 
     bool value(const QtProperty *property) const;
-    bool textVisible(const QtProperty *property) const;
 
 public Q_SLOTS:
     void setValue(QtProperty *property, bool val);
-    void setTextVisible(QtProperty *property, bool textVisible);
 Q_SIGNALS:
     void valueChanged(QtProperty *property, bool val);
-    void textVisibleChanged(QtProperty *property, bool);
 protected:
     QString valueText(const QtProperty *property) const;
     QIcon valueIcon(const QtProperty *property) const;
     virtual void initializeProperty(QtProperty *property);
     virtual void uninitializeProperty(QtProperty *property);
 private:
-    QtBoolPropertyManagerPrivate *d_ptr;
+    QScopedPointer<QtBoolPropertyManagerPrivate> d_ptr;
     Q_DECLARE_PRIVATE(QtBoolPropertyManager)
-    Q_DISABLE_COPY(QtBoolPropertyManager)
+    Q_DISABLE_COPY_MOVE(QtBoolPropertyManager)
 };
 
 class QtDoublePropertyManagerPrivate;
@@ -142,7 +129,6 @@ class QT_QTPROPERTYBROWSER_EXPORT QtDoublePropertyManager : public QtAbstractPro
 {
     Q_OBJECT
 public:
-	typedef double value_type;
     QtDoublePropertyManager(QObject *parent = 0);
     ~QtDoublePropertyManager();
 
@@ -151,7 +137,6 @@ public:
     double maximum(const QtProperty *property) const;
     double singleStep(const QtProperty *property) const;
     int decimals(const QtProperty *property) const;
-    bool isReadOnly(const QtProperty *property) const;
 
 public Q_SLOTS:
     void setValue(QtProperty *property, double val);
@@ -160,21 +145,19 @@ public Q_SLOTS:
     void setRange(QtProperty *property, double minVal, double maxVal);
     void setSingleStep(QtProperty *property, double step);
     void setDecimals(QtProperty *property, int prec);
-    void setReadOnly(QtProperty *property, bool readOnly);
 Q_SIGNALS:
     void valueChanged(QtProperty *property, double val);
     void rangeChanged(QtProperty *property, double minVal, double maxVal);
     void singleStepChanged(QtProperty *property, double step);
     void decimalsChanged(QtProperty *property, int prec);
-    void readOnlyChanged(QtProperty *property, bool readOnly);
 protected:
     QString valueText(const QtProperty *property) const;
     virtual void initializeProperty(QtProperty *property);
     virtual void uninitializeProperty(QtProperty *property);
 private:
-    QtDoublePropertyManagerPrivate *d_ptr;
+    QScopedPointer<QtDoublePropertyManagerPrivate> d_ptr;
     Q_DECLARE_PRIVATE(QtDoublePropertyManager)
-    Q_DISABLE_COPY(QtDoublePropertyManager)
+    Q_DISABLE_COPY_MOVE(QtDoublePropertyManager)
 };
 
 class QtStringPropertyManagerPrivate;
@@ -183,36 +166,26 @@ class QT_QTPROPERTYBROWSER_EXPORT QtStringPropertyManager : public QtAbstractPro
 {
     Q_OBJECT
 public:
-	typedef QString value_type;
     QtStringPropertyManager(QObject *parent = 0);
     ~QtStringPropertyManager();
 
     QString value(const QtProperty *property) const;
     QRegExp regExp(const QtProperty *property) const;
-    EchoMode echoMode(const QtProperty *property) const;
-    bool isReadOnly(const QtProperty *property) const;
 
 public Q_SLOTS:
     void setValue(QtProperty *property, const QString &val);
     void setRegExp(QtProperty *property, const QRegExp &regExp);
-    void setEchoMode(QtProperty *property, EchoMode echoMode);
-    void setReadOnly(QtProperty *property, bool readOnly);
-
 Q_SIGNALS:
     void valueChanged(QtProperty *property, const QString &val);
     void regExpChanged(QtProperty *property, const QRegExp &regExp);
-    void echoModeChanged(QtProperty *property, const int);
-    void readOnlyChanged(QtProperty *property, bool);
-
 protected:
     QString valueText(const QtProperty *property) const;
-    QString displayText(const QtProperty *property) const;
     virtual void initializeProperty(QtProperty *property);
     virtual void uninitializeProperty(QtProperty *property);
 private:
-    QtStringPropertyManagerPrivate *d_ptr;
+    QScopedPointer<QtStringPropertyManagerPrivate> d_ptr;
     Q_DECLARE_PRIVATE(QtStringPropertyManager)
-    Q_DISABLE_COPY(QtStringPropertyManager)
+    Q_DISABLE_COPY_MOVE(QtStringPropertyManager)
 };
 
 class QtDatePropertyManagerPrivate;
@@ -221,7 +194,6 @@ class QT_QTPROPERTYBROWSER_EXPORT QtDatePropertyManager : public QtAbstractPrope
 {
     Q_OBJECT
 public:
-	typedef QDate value_type;
     QtDatePropertyManager(QObject *parent = 0);
     ~QtDatePropertyManager();
 
@@ -242,9 +214,9 @@ protected:
     virtual void initializeProperty(QtProperty *property);
     virtual void uninitializeProperty(QtProperty *property);
 private:
-    QtDatePropertyManagerPrivate *d_ptr;
+    QScopedPointer<QtDatePropertyManagerPrivate> d_ptr;
     Q_DECLARE_PRIVATE(QtDatePropertyManager)
-    Q_DISABLE_COPY(QtDatePropertyManager)
+    Q_DISABLE_COPY_MOVE(QtDatePropertyManager)
 };
 
 class QtTimePropertyManagerPrivate;
@@ -253,7 +225,6 @@ class QT_QTPROPERTYBROWSER_EXPORT QtTimePropertyManager : public QtAbstractPrope
 {
     Q_OBJECT
 public:
-	typedef QTime value_type;
     QtTimePropertyManager(QObject *parent = 0);
     ~QtTimePropertyManager();
 
@@ -268,9 +239,9 @@ protected:
     virtual void initializeProperty(QtProperty *property);
     virtual void uninitializeProperty(QtProperty *property);
 private:
-    QtTimePropertyManagerPrivate *d_ptr;
+    QScopedPointer<QtTimePropertyManagerPrivate> d_ptr;
     Q_DECLARE_PRIVATE(QtTimePropertyManager)
-    Q_DISABLE_COPY(QtTimePropertyManager)
+    Q_DISABLE_COPY_MOVE(QtTimePropertyManager)
 };
 
 class QtDateTimePropertyManagerPrivate;
@@ -279,7 +250,6 @@ class QT_QTPROPERTYBROWSER_EXPORT QtDateTimePropertyManager : public QtAbstractP
 {
     Q_OBJECT
 public:
-	typedef QDateTime value_type;
     QtDateTimePropertyManager(QObject *parent = 0);
     ~QtDateTimePropertyManager();
 
@@ -294,9 +264,9 @@ protected:
     virtual void initializeProperty(QtProperty *property);
     virtual void uninitializeProperty(QtProperty *property);
 private:
-    QtDateTimePropertyManagerPrivate *d_ptr;
+    QScopedPointer<QtDateTimePropertyManagerPrivate> d_ptr;
     Q_DECLARE_PRIVATE(QtDateTimePropertyManager)
-    Q_DISABLE_COPY(QtDateTimePropertyManager)
+    Q_DISABLE_COPY_MOVE(QtDateTimePropertyManager)
 };
 
 class QtKeySequencePropertyManagerPrivate;
@@ -305,7 +275,6 @@ class QT_QTPROPERTYBROWSER_EXPORT QtKeySequencePropertyManager : public QtAbstra
 {
     Q_OBJECT
 public:
-	typedef QKeySequence value_type;
     QtKeySequencePropertyManager(QObject *parent = 0);
     ~QtKeySequencePropertyManager();
 
@@ -320,9 +289,9 @@ protected:
     virtual void initializeProperty(QtProperty *property);
     virtual void uninitializeProperty(QtProperty *property);
 private:
-    QtKeySequencePropertyManagerPrivate *d_ptr;
+    QScopedPointer<QtKeySequencePropertyManagerPrivate> d_ptr;
     Q_DECLARE_PRIVATE(QtKeySequencePropertyManager)
-    Q_DISABLE_COPY(QtKeySequencePropertyManager)
+    Q_DISABLE_COPY_MOVE(QtKeySequencePropertyManager)
 };
 
 class QtCharPropertyManagerPrivate;
@@ -331,7 +300,6 @@ class QT_QTPROPERTYBROWSER_EXPORT QtCharPropertyManager : public QtAbstractPrope
 {
     Q_OBJECT
 public:
-	typedef QChar value_type;
     QtCharPropertyManager(QObject *parent = 0);
     ~QtCharPropertyManager();
 
@@ -346,9 +314,9 @@ protected:
     virtual void initializeProperty(QtProperty *property);
     virtual void uninitializeProperty(QtProperty *property);
 private:
-    QtCharPropertyManagerPrivate *d_ptr;
+    QScopedPointer<QtCharPropertyManagerPrivate> d_ptr;
     Q_DECLARE_PRIVATE(QtCharPropertyManager)
-    Q_DISABLE_COPY(QtCharPropertyManager)
+    Q_DISABLE_COPY_MOVE(QtCharPropertyManager)
 };
 
 class QtEnumPropertyManager;
@@ -358,7 +326,6 @@ class QT_QTPROPERTYBROWSER_EXPORT QtLocalePropertyManager : public QtAbstractPro
 {
     Q_OBJECT
 public:
-	typedef QLocale value_type;
     QtLocalePropertyManager(QObject *parent = 0);
     ~QtLocalePropertyManager();
 
@@ -375,9 +342,9 @@ protected:
     virtual void initializeProperty(QtProperty *property);
     virtual void uninitializeProperty(QtProperty *property);
 private:
-    QtLocalePropertyManagerPrivate *d_ptr;
+    QScopedPointer<QtLocalePropertyManagerPrivate> d_ptr;
     Q_DECLARE_PRIVATE(QtLocalePropertyManager)
-    Q_DISABLE_COPY(QtLocalePropertyManager)
+    Q_DISABLE_COPY_MOVE(QtLocalePropertyManager)
     Q_PRIVATE_SLOT(d_func(), void slotEnumChanged(QtProperty *, int))
     Q_PRIVATE_SLOT(d_func(), void slotPropertyDestroyed(QtProperty *))
 };
@@ -388,7 +355,6 @@ class QT_QTPROPERTYBROWSER_EXPORT QtPointPropertyManager : public QtAbstractProp
 {
     Q_OBJECT
 public:
-	typedef QPoint value_type;
     QtPointPropertyManager(QObject *parent = 0);
     ~QtPointPropertyManager();
 
@@ -405,9 +371,9 @@ protected:
     virtual void initializeProperty(QtProperty *property);
     virtual void uninitializeProperty(QtProperty *property);
 private:
-    QtPointPropertyManagerPrivate *d_ptr;
+    QScopedPointer<QtPointPropertyManagerPrivate> d_ptr;
     Q_DECLARE_PRIVATE(QtPointPropertyManager)
-    Q_DISABLE_COPY(QtPointPropertyManager)
+    Q_DISABLE_COPY_MOVE(QtPointPropertyManager)
     Q_PRIVATE_SLOT(d_func(), void slotIntChanged(QtProperty *, int))
     Q_PRIVATE_SLOT(d_func(), void slotPropertyDestroyed(QtProperty *))
 };
@@ -418,7 +384,6 @@ class QT_QTPROPERTYBROWSER_EXPORT QtPointFPropertyManager : public QtAbstractPro
 {
     Q_OBJECT
 public:
-	typedef QPointF value_type;
     QtPointFPropertyManager(QObject *parent = 0);
     ~QtPointFPropertyManager();
 
@@ -438,9 +403,9 @@ protected:
     virtual void initializeProperty(QtProperty *property);
     virtual void uninitializeProperty(QtProperty *property);
 private:
-    QtPointFPropertyManagerPrivate *d_ptr;
+    QScopedPointer<QtPointFPropertyManagerPrivate> d_ptr;
     Q_DECLARE_PRIVATE(QtPointFPropertyManager)
-    Q_DISABLE_COPY(QtPointFPropertyManager)
+    Q_DISABLE_COPY_MOVE(QtPointFPropertyManager)
     Q_PRIVATE_SLOT(d_func(), void slotDoubleChanged(QtProperty *, double))
     Q_PRIVATE_SLOT(d_func(), void slotPropertyDestroyed(QtProperty *))
 };
@@ -451,7 +416,6 @@ class QT_QTPROPERTYBROWSER_EXPORT QtSizePropertyManager : public QtAbstractPrope
 {
     Q_OBJECT
 public:
-	typedef QSize value_type;
     QtSizePropertyManager(QObject *parent = 0);
     ~QtSizePropertyManager();
 
@@ -474,9 +438,9 @@ protected:
     virtual void initializeProperty(QtProperty *property);
     virtual void uninitializeProperty(QtProperty *property);
 private:
-    QtSizePropertyManagerPrivate *d_ptr;
+    QScopedPointer<QtSizePropertyManagerPrivate> d_ptr;
     Q_DECLARE_PRIVATE(QtSizePropertyManager)
-    Q_DISABLE_COPY(QtSizePropertyManager)
+    Q_DISABLE_COPY_MOVE(QtSizePropertyManager)
     Q_PRIVATE_SLOT(d_func(), void slotIntChanged(QtProperty *, int))
     Q_PRIVATE_SLOT(d_func(), void slotPropertyDestroyed(QtProperty *))
 };
@@ -487,7 +451,6 @@ class QT_QTPROPERTYBROWSER_EXPORT QtSizeFPropertyManager : public QtAbstractProp
 {
     Q_OBJECT
 public:
-	typedef QSizeF value_type;
     QtSizeFPropertyManager(QObject *parent = 0);
     ~QtSizeFPropertyManager();
 
@@ -513,9 +476,9 @@ protected:
     virtual void initializeProperty(QtProperty *property);
     virtual void uninitializeProperty(QtProperty *property);
 private:
-    QtSizeFPropertyManagerPrivate *d_ptr;
+    QScopedPointer<QtSizeFPropertyManagerPrivate> d_ptr;
     Q_DECLARE_PRIVATE(QtSizeFPropertyManager)
-    Q_DISABLE_COPY(QtSizeFPropertyManager)
+    Q_DISABLE_COPY_MOVE(QtSizeFPropertyManager)
     Q_PRIVATE_SLOT(d_func(), void slotDoubleChanged(QtProperty *, double))
     Q_PRIVATE_SLOT(d_func(), void slotPropertyDestroyed(QtProperty *))
 };
@@ -526,7 +489,6 @@ class QT_QTPROPERTYBROWSER_EXPORT QtRectPropertyManager : public QtAbstractPrope
 {
     Q_OBJECT
 public:
-	typedef QRect value_type;
     QtRectPropertyManager(QObject *parent = 0);
     ~QtRectPropertyManager();
 
@@ -546,9 +508,9 @@ protected:
     virtual void initializeProperty(QtProperty *property);
     virtual void uninitializeProperty(QtProperty *property);
 private:
-    QtRectPropertyManagerPrivate *d_ptr;
+    QScopedPointer<QtRectPropertyManagerPrivate> d_ptr;
     Q_DECLARE_PRIVATE(QtRectPropertyManager)
-    Q_DISABLE_COPY(QtRectPropertyManager)
+    Q_DISABLE_COPY_MOVE(QtRectPropertyManager)
     Q_PRIVATE_SLOT(d_func(), void slotIntChanged(QtProperty *, int))
     Q_PRIVATE_SLOT(d_func(), void slotPropertyDestroyed(QtProperty *))
 };
@@ -559,7 +521,6 @@ class QT_QTPROPERTYBROWSER_EXPORT QtRectFPropertyManager : public QtAbstractProp
 {
     Q_OBJECT
 public:
-	typedef QRectF value_type;
     QtRectFPropertyManager(QObject *parent = 0);
     ~QtRectFPropertyManager();
 
@@ -582,9 +543,9 @@ protected:
     virtual void initializeProperty(QtProperty *property);
     virtual void uninitializeProperty(QtProperty *property);
 private:
-    QtRectFPropertyManagerPrivate *d_ptr;
+    QScopedPointer<QtRectFPropertyManagerPrivate> d_ptr;
     Q_DECLARE_PRIVATE(QtRectFPropertyManager)
-    Q_DISABLE_COPY(QtRectFPropertyManager)
+    Q_DISABLE_COPY_MOVE(QtRectFPropertyManager)
     Q_PRIVATE_SLOT(d_func(), void slotDoubleChanged(QtProperty *, double))
     Q_PRIVATE_SLOT(d_func(), void slotPropertyDestroyed(QtProperty *))
 };
@@ -595,7 +556,6 @@ class QT_QTPROPERTYBROWSER_EXPORT QtEnumPropertyManager : public QtAbstractPrope
 {
     Q_OBJECT
 public:
-	typedef int value_type;
     QtEnumPropertyManager(QObject *parent = 0);
     ~QtEnumPropertyManager();
 
@@ -617,9 +577,9 @@ protected:
     virtual void initializeProperty(QtProperty *property);
     virtual void uninitializeProperty(QtProperty *property);
 private:
-    QtEnumPropertyManagerPrivate *d_ptr;
+    QScopedPointer<QtEnumPropertyManagerPrivate> d_ptr;
     Q_DECLARE_PRIVATE(QtEnumPropertyManager)
-    Q_DISABLE_COPY(QtEnumPropertyManager)
+    Q_DISABLE_COPY_MOVE(QtEnumPropertyManager)
 };
 
 class QtFlagPropertyManagerPrivate;
@@ -628,7 +588,6 @@ class QT_QTPROPERTYBROWSER_EXPORT QtFlagPropertyManager : public QtAbstractPrope
 {
     Q_OBJECT
 public:
-	typedef int value_type;
     QtFlagPropertyManager(QObject *parent = 0);
     ~QtFlagPropertyManager();
 
@@ -648,9 +607,9 @@ protected:
     virtual void initializeProperty(QtProperty *property);
     virtual void uninitializeProperty(QtProperty *property);
 private:
-    QtFlagPropertyManagerPrivate *d_ptr;
+    QScopedPointer<QtFlagPropertyManagerPrivate> d_ptr;
     Q_DECLARE_PRIVATE(QtFlagPropertyManager)
-    Q_DISABLE_COPY(QtFlagPropertyManager)
+    Q_DISABLE_COPY_MOVE(QtFlagPropertyManager)
     Q_PRIVATE_SLOT(d_func(), void slotBoolChanged(QtProperty *, bool))
     Q_PRIVATE_SLOT(d_func(), void slotPropertyDestroyed(QtProperty *))
 };
@@ -661,7 +620,6 @@ class QT_QTPROPERTYBROWSER_EXPORT QtSizePolicyPropertyManager : public QtAbstrac
 {
     Q_OBJECT
 public:
-	typedef QSizePolicy value_type;
     QtSizePolicyPropertyManager(QObject *parent = 0);
     ~QtSizePolicyPropertyManager();
 
@@ -679,9 +637,9 @@ protected:
     virtual void initializeProperty(QtProperty *property);
     virtual void uninitializeProperty(QtProperty *property);
 private:
-    QtSizePolicyPropertyManagerPrivate *d_ptr;
+    QScopedPointer<QtSizePolicyPropertyManagerPrivate> d_ptr;
     Q_DECLARE_PRIVATE(QtSizePolicyPropertyManager)
-    Q_DISABLE_COPY(QtSizePolicyPropertyManager)
+    Q_DISABLE_COPY_MOVE(QtSizePolicyPropertyManager)
     Q_PRIVATE_SLOT(d_func(), void slotIntChanged(QtProperty *, int))
     Q_PRIVATE_SLOT(d_func(), void slotEnumChanged(QtProperty *, int))
     Q_PRIVATE_SLOT(d_func(), void slotPropertyDestroyed(QtProperty *))
@@ -693,7 +651,6 @@ class QT_QTPROPERTYBROWSER_EXPORT QtFontPropertyManager : public QtAbstractPrope
 {
     Q_OBJECT
 public:
-	typedef QFont value_type;
     QtFontPropertyManager(QObject *parent = 0);
     ~QtFontPropertyManager();
 
@@ -713,9 +670,9 @@ protected:
     virtual void initializeProperty(QtProperty *property);
     virtual void uninitializeProperty(QtProperty *property);
 private:
-    QtFontPropertyManagerPrivate *d_ptr;
+    QScopedPointer<QtFontPropertyManagerPrivate> d_ptr;
     Q_DECLARE_PRIVATE(QtFontPropertyManager)
-    Q_DISABLE_COPY(QtFontPropertyManager)
+    Q_DISABLE_COPY_MOVE(QtFontPropertyManager)
     Q_PRIVATE_SLOT(d_func(), void slotIntChanged(QtProperty *, int))
     Q_PRIVATE_SLOT(d_func(), void slotEnumChanged(QtProperty *, int))
     Q_PRIVATE_SLOT(d_func(), void slotBoolChanged(QtProperty *, bool))
@@ -730,7 +687,6 @@ class QT_QTPROPERTYBROWSER_EXPORT QtColorPropertyManager : public QtAbstractProp
 {
     Q_OBJECT
 public:
-	typedef QColor value_type;
     QtColorPropertyManager(QObject *parent = 0);
     ~QtColorPropertyManager();
 
@@ -748,9 +704,9 @@ protected:
     virtual void initializeProperty(QtProperty *property);
     virtual void uninitializeProperty(QtProperty *property);
 private:
-    QtColorPropertyManagerPrivate *d_ptr;
+    QScopedPointer<QtColorPropertyManagerPrivate> d_ptr;
     Q_DECLARE_PRIVATE(QtColorPropertyManager)
-    Q_DISABLE_COPY(QtColorPropertyManager)
+    Q_DISABLE_COPY_MOVE(QtColorPropertyManager)
     Q_PRIVATE_SLOT(d_func(), void slotIntChanged(QtProperty *, int))
     Q_PRIVATE_SLOT(d_func(), void slotPropertyDestroyed(QtProperty *))
 };
@@ -761,7 +717,6 @@ class QT_QTPROPERTYBROWSER_EXPORT QtCursorPropertyManager : public QtAbstractPro
 {
     Q_OBJECT
 public:
-	typedef QCursor value_type;
     QtCursorPropertyManager(QObject *parent = 0);
     ~QtCursorPropertyManager();
 
@@ -779,13 +734,11 @@ protected:
     virtual void initializeProperty(QtProperty *property);
     virtual void uninitializeProperty(QtProperty *property);
 private:
-    QtCursorPropertyManagerPrivate *d_ptr;
+    QScopedPointer<QtCursorPropertyManagerPrivate> d_ptr;
     Q_DECLARE_PRIVATE(QtCursorPropertyManager)
-    Q_DISABLE_COPY(QtCursorPropertyManager)
+    Q_DISABLE_COPY_MOVE(QtCursorPropertyManager)
 };
 
-#if QT_VERSION >= 0x040400
 QT_END_NAMESPACE
-#endif
 
 #endif

@@ -1,56 +1,49 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc and/or its subsidiary(-ies).
-** Contact: http://www.qt-project.org/legal
+** Copyright (C) 2016 The Qt Company Ltd.
+** Contact: https://www.qt.io/licensing/
 **
-** This file is part of the Qt Solutions component.
+** This file is part of the tools applications of the Qt Toolkit.
 **
-** $QT_BEGIN_LICENSE:BSD$
-** You may use this file under the terms of the BSD license as follows:
+** $QT_BEGIN_LICENSE:LGPL$
+** Commercial License Usage
+** Licensees holding valid commercial Qt licenses may use this file in
+** accordance with the commercial license agreement provided with the
+** Software or, alternatively, in accordance with the terms contained in
+** a written agreement between you and The Qt Company. For licensing terms
+** and conditions see https://www.qt.io/terms-conditions. For further
+** information use the contact form at https://www.qt.io/contact-us.
 **
-** "Redistribution and use in source and binary forms, with or without
-** modification, are permitted provided that the following conditions are
-** met:
-**   * Redistributions of source code must retain the above copyright
-**     notice, this list of conditions and the following disclaimer.
-**   * Redistributions in binary form must reproduce the above copyright
-**     notice, this list of conditions and the following disclaimer in
-**     the documentation and/or other materials provided with the
-**     distribution.
-**   * Neither the name of Digia Plc and its Subsidiary(-ies) nor the names
-**     of its contributors may be used to endorse or promote products derived
-**     from this software without specific prior written permission.
+** GNU Lesser General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU Lesser
+** General Public License version 3 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL3 included in the
+** packaging of this file. Please review the following information to
+** ensure the GNU Lesser General Public License version 3 requirements
+** will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
 **
-**
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-** "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-** LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-** A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-** OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-** SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-** LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-** DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-** THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU
+** General Public License version 2.0 or (at your option) the GNU General
+** Public license version 3 or any later version approved by the KDE Free
+** Qt Foundation. The licenses are as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL2 and LICENSE.GPL3
+** included in the packaging of this file. Please review the following
+** information to ensure the GNU General Public License requirements will
+** be met: https://www.gnu.org/licenses/gpl-2.0.html and
+** https://www.gnu.org/licenses/gpl-3.0.html.
 **
 ** $QT_END_LICENSE$
 **
 ****************************************************************************/
 
-
 #ifndef QTPROPERTYBROWSER_H
 #define QTPROPERTYBROWSER_H
 
-#include <QWidget>
-#include <QSet>
-#include <QLineEdit>
-#include <QDateTime>
-#include <QKeyEvent>
+#include <QtWidgets/QWidget>
+#include <QtCore/QSet>
 
-#if QT_VERSION >= 0x040400
 QT_BEGIN_NAMESPACE
-#endif
 
 #if defined(Q_OS_WIN)
 #  if !defined(QT_QTPROPERTYBROWSER_EXPORT) && !defined(QT_QTPROPERTYBROWSER_IMPORT)
@@ -68,47 +61,39 @@ QT_BEGIN_NAMESPACE
 #  define QT_QTPROPERTYBROWSER_EXPORT
 #endif
 
-typedef QLineEdit::EchoMode EchoMode;
-
 class QtAbstractPropertyManager;
 class QtPropertyPrivate;
 
 class QT_QTPROPERTYBROWSER_EXPORT QtProperty
 {
 public:
-	enum BackupMode
-	{
-		NoBackup,
-		BackupToInitial,	//back to initial value when editor created
-		BackupToLast,		//back to last value when editor activate/gaining focus
-		BackupToCurrent,	//back to current (latest committed) property value, useful for focus editing mode only (i.e. line edit, spin)
-	};
     virtual ~QtProperty();
 
     QList<QtProperty *> subProperties() const;
 
     QtAbstractPropertyManager *propertyManager() const;
 
-    QString toolTip() const;
+    QString toolTip() const { return valueToolTip(); } // Compatibility
+    QString valueToolTip() const;
+    QString descriptionToolTip() const;
     QString statusTip() const;
     QString whatsThis() const;
     QString propertyName() const;
     bool isEnabled() const;
     bool isModified() const;
-	BackupMode backupMode() const;
 
     bool hasValue() const;
     QIcon valueIcon() const;
     QString valueText() const;
-    QString displayText() const;
 
-    void setToolTip(const QString &text);
+    void setToolTip(const QString &text) { setValueToolTip(text); }  // Compatibility
+    void setValueToolTip(const QString &text);
+    void setDescriptionToolTip(const QString &text);
     void setStatusTip(const QString &text);
     void setWhatsThis(const QString &text);
     void setPropertyName(const QString &text);
     void setEnabled(bool enable);
     void setModified(bool modified);
-	void setBackupMode(BackupMode mode);
 
     void addSubProperty(QtProperty *property);
     void insertSubProperty(QtProperty *property, QtProperty *afterProperty);
@@ -118,7 +103,7 @@ protected:
     void propertyChanged();
 private:
     friend class QtAbstractPropertyManager;
-    QtPropertyPrivate *d_ptr;
+    QScopedPointer<QtPropertyPrivate> d_ptr;
 };
 
 class QtAbstractPropertyManagerPrivate;
@@ -146,16 +131,14 @@ protected:
     virtual bool hasValue(const QtProperty *property) const;
     virtual QIcon valueIcon(const QtProperty *property) const;
     virtual QString valueText(const QtProperty *property) const;
-    virtual QString displayText(const QtProperty *property) const;
-    virtual EchoMode echoMode(const QtProperty *) const;
     virtual void initializeProperty(QtProperty *property) = 0;
     virtual void uninitializeProperty(QtProperty *property);
     virtual QtProperty *createProperty();
 private:
     friend class QtProperty;
-    QtAbstractPropertyManagerPrivate *d_ptr;
+    QScopedPointer<QtAbstractPropertyManagerPrivate> d_ptr;
     Q_DECLARE_PRIVATE(QtAbstractPropertyManager)
-    Q_DISABLE_COPY(QtAbstractPropertyManager)
+    Q_DISABLE_COPY_MOVE(QtAbstractPropertyManager)
 };
 
 class QT_QTPROPERTYBROWSER_EXPORT QtAbstractEditorFactoryBase : public QObject
@@ -175,85 +158,15 @@ protected Q_SLOTS:
 };
 
 template <class PropertyManager>
-class QtBackupMananger
+class QT_QTPROPERTYBROWSER_EXPORT QtAbstractEditorFactory : public QtAbstractEditorFactoryBase
 {
 public:
-	typedef typename PropertyManager::value_type value_type;
-	///note: one property can have multiple editors, so create per editor backup
-	///this is also easy and won't change implementations of QtAbstractPropertyManager
-	void backup(PropertyManager* manger, QtProperty* prop, QWidget* editor)
-	{
-		value_type val = manger->value(prop);
-		QtBakcupItem bi = {prop, val};
-		mBackupMap[editor] = bi;
-	}
-	void backup(QWidget* editor)
-	{
-		EditorToBackup::iterator it = mBackupMap.find(editor);
-		if(it != mBackupMap.end())
-		{
-			QtProperty* p = it.value().prop;
-			if(p->backupMode() != QtProperty::BackupToInitial)
-			{
-				PropertyManager* pm = static_cast<PropertyManager*>(p->propertyManager());
-				it.value().val = pm->value(p);
-			}
-		}
-	}
-	bool restore(QWidget* editor, value_type& outVal)
-	{
-		EditorToBackup::iterator it = mBackupMap.find(editor);
-		if(it != mBackupMap.end())
-		{
-			QtProperty* p = it.value().prop;
-			PropertyManager* pm = static_cast<PropertyManager*>(p->propertyManager());
-			if (p->backupMode() == QtProperty::BackupToCurrent)
-				it.value().val = pm->value(p);
-			else
-				pm->setValue(p, it.value().val);
-			outVal = it.value().val;
-			return true;
-		}
-		return false;
-	}
-	void remove(QWidget* editor)
-	{
-		EditorToBackup::iterator it = mBackupMap.find(editor);
-		if(it != mBackupMap.end())
-			mBackupMap.erase(it);
-	}
-protected:
-	struct QtBakcupItem
-	{
-		QtProperty*	prop;
-		value_type	val;
-	};
-	typedef QMap<QWidget*, QtBakcupItem> EditorToBackup;
-	EditorToBackup mBackupMap;
-};
-
-template <class PropertyManager>
-class QtAbstractEditorFactory : public QtAbstractEditorFactoryBase
-{
-public:
-	typedef typename QtBackupMananger<PropertyManager>::value_type value_type;
-
     explicit QtAbstractEditorFactory(QObject *parent) : QtAbstractEditorFactoryBase(parent) {}
     QWidget *createEditor(QtProperty *property, QWidget *parent)
     {
-        QSetIterator<PropertyManager *> it(m_managers);
-        while (it.hasNext()) {
-            PropertyManager *manager = it.next();
+        for (PropertyManager *manager : qAsConst(m_managers)) {
             if (manager == property->propertyManager()) {
-                 QWidget* widget = createEditor(manager, property, parent);
-				///note: change backup mode in the middle of editing won't change 
-				///its behavior
-				if(widget != Q_NULLPTR && property->backupMode() != QtProperty::NoBackup)
-				{
-					widget->installEventFilter(this);
-					mBackupManager.backup(manager, property, widget);
-				}
-				return widget;
+                return createEditor(manager, property, parent);
             }
         }
         return 0;
@@ -283,9 +196,7 @@ public:
     PropertyManager *propertyManager(QtProperty *property) const
     {
         QtAbstractPropertyManager *manager = property->propertyManager();
-        QSetIterator<PropertyManager *> itManager(m_managers);
-        while (itManager.hasNext()) {
-            PropertyManager *m = itManager.next();
+        for (PropertyManager *m : qAsConst(m_managers)) {
             if (m == manager) {
                 return m;
             }
@@ -299,48 +210,17 @@ protected:
     virtual void disconnectPropertyManager(PropertyManager *manager) = 0;
     void managerDestroyed(QObject *manager)
     {
-        QSetIterator<PropertyManager *> it(m_managers);
-        while (it.hasNext()) {
-            PropertyManager *m = it.next();
+        for (PropertyManager *m : qAsConst(m_managers)) {
             if (m == manager) {
                 m_managers.remove(m);
                 return;
             }
         }
     }
-	
-	//TODO: this is much better, but need modify each implementation
-	virtual value_type value(QWidget* editor) const { Q_UNUSED(editor); return value_type(); }
-	virtual bool setValue(QWidget* editor, value_type val) const { Q_UNUSED(editor); Q_UNUSED(val); return false; }
-
-	virtual bool eventFilter(QObject *watched, QEvent *evt)
-	{
-		//destruction safety guard
-		if (this->propertyManagers().size() == 0)
-			return false;
-		
-		QWidget* editor = static_cast<QWidget*>(watched);//unsafe cast but safe use in map
-		if(evt->type() == QEvent::FocusIn)
-		{
-			mBackupManager.backup(editor);
-		}
-		else if (evt->type() == QEvent::KeyPress && static_cast<QKeyEvent*>(evt)->key() == Qt::Key_Escape)
-		{
-			value_type val;
-			if (mBackupManager.restore(editor, val))
-				this->setValue(editor, val);
-		}
-		else if(evt->type() == QEvent::Destroy)
-			mBackupManager.remove(editor);
-		return false;
-	}
-	QtBackupMananger<PropertyManager> mBackupManager;
 private:
     void breakConnection(QtAbstractPropertyManager *manager)
     {
-        QSetIterator<PropertyManager *> it(m_managers);
-        while (it.hasNext()) {
-            PropertyManager *m = it.next();
+        for (PropertyManager *m : qAsConst(m_managers)) {
             if (m == manager) {
                 removePropertyManager(m);
                 return;
@@ -365,7 +245,7 @@ public:
 private:
     explicit QtBrowserItem(QtAbstractPropertyBrowser *browser, QtProperty *property, QtBrowserItem *parent);
     ~QtBrowserItem();
-    QtBrowserItemPrivate *d_ptr;
+    QScopedPointer<QtBrowserItemPrivate> d_ptr;
     friend class QtAbstractPropertyBrowserPrivate;
 };
 
@@ -409,7 +289,6 @@ public Q_SLOTS:
     QtBrowserItem *insertProperty(QtProperty *property, QtProperty *afterProperty);
     void removeProperty(QtProperty *property);
 
-	QtAbstractEditorFactoryBase* matchFactory(QtProperty* prop);
 protected:
 
     virtual void itemInserted(QtBrowserItem *item, QtBrowserItem *afterItem) = 0;
@@ -423,9 +302,9 @@ private:
     bool addFactory(QtAbstractPropertyManager *abstractManager,
                 QtAbstractEditorFactoryBase *abstractFactory);
 
-    QtAbstractPropertyBrowserPrivate *d_ptr;
+    QScopedPointer<QtAbstractPropertyBrowserPrivate> d_ptr;
     Q_DECLARE_PRIVATE(QtAbstractPropertyBrowser)
-    Q_DISABLE_COPY(QtAbstractPropertyBrowser)
+    Q_DISABLE_COPY_MOVE(QtAbstractPropertyBrowser)
     Q_PRIVATE_SLOT(d_func(), void slotPropertyInserted(QtProperty *,
                             QtProperty *, QtProperty *))
     Q_PRIVATE_SLOT(d_func(), void slotPropertyRemoved(QtProperty *,
@@ -435,8 +314,6 @@ private:
 
 };
 
-#if QT_VERSION >= 0x040400
 QT_END_NAMESPACE
-#endif
 
 #endif // QTPROPERTYBROWSER_H
