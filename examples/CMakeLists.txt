@@ -18,3 +18,7 @@ ADD_SUBDIRECTORY(demo)
 ADD_SUBDIRECTORY(extension)
 ADD_SUBDIRECTORY(object_controller)
 ADD_SUBDIRECTORY(simple)
+
+
+# custom
+ADD_SUBDIRECTORY(extension_browser)

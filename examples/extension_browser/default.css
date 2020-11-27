@@ -1,0 +1,54 @@
+TitleButton {
+    height: 26px;
+    background: #E5E5E5;
+    color: #262626;
+    padding: 0px;
+    margin: 0px;
+    border: 0px;
+    border-radius: 0px;
+    border-bottom: 1px solid #C0C0C0;
+}
+
+TitleButton::branch:open {
+    /*image: url(:/images/tree-open-light.png);*/
+}
+
+TitleButton::branch:close {
+    /*image: url(:/images/tree-close-light.png);*/
+}
+
+CustomBrowser > QScrollArea {
+    border: none;
+}
+
+CustomBrowser > QWidget#TipInfoWidget {
+    background-color: white;
+    border: none;
+    border-top: 1px solid #999999;
+    min-width: 300px;
+}
+
+CustomBrowser QWidget#TipInfoWidget > QLabel {
+    font-weight: bold;
+    font-size: 12px;
+}
+
+CustomBrowser QWidget#TipInfoWidget > QTextBrowser {
+    border: none;
+}
+
+LineEditWithButton #LineEdit_Btn {
+    image: url(:/images/preferenceOpenFile.png);
+}
+
+LineEditWithButton {
+    border: 1px solid black;
+}
+
+#ValueWidget[level="None"] {
+    border: 1px solid #808080;
+}
+
+#ValueWidget[level="Error"] {
+    border: 1px solid #ff0000;
+}
