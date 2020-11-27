@@ -5,6 +5,8 @@ set(CMAKE_AUTOMOC ON)
 # to always look for includes there:
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
+set(CMAKE_DEBUG_POSTFIX "D")
+
 set(_SRCS
   qtbuttonpropertybrowser.cpp
   qteditorfactory.cpp
@@ -31,12 +33,16 @@ QT5_ADD_RESOURCES(_QRC_SRCS ${_RESOURCES})
 
 set(TARGET_NAME ${PROJECT_NAME})
 
-add_library(${TARGET_NAME}
+add_library(${TARGET_NAME} SHARED
   ${_SRCS}
   ${_UI_SRCS}
   ${_QRC_SRCS}
   ${_IMPL_HDRS}
   )
+
+IF (BUILD_SHARED)
+    add_definitions(-DQT_QTPROPERTYBROWSER_EXPORT)
+ENDIF()
 
 target_link_libraries(${TARGET_NAME} Qt5::Widgets)
 
