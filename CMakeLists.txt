@@ -1,6 +1,9 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
 PROJECT(QtPropertyBrowser)
 
+######################## SHARED library Config #########################
+OPTION (BUILD_SHARED "Build Shared" ON)
+
 ########################### Misc. Configs ##############################
 # Add custom cmake files folder
 SET (PROJECT_CMAKE_DIR ${PROJECT_SOURCE_DIR}/cmake)
@@ -42,6 +45,7 @@ MESSAGE(STATUS "Build type Flags:   ${CMAKE_BUILD_TYPE_FLAGS}")
 MESSAGE(STATUS "C++ compile flags:  ${CMAKE_CXX_FLAGS}")
 MESSAGE(STATUS "Install Path:       ${CMAKE_INSTALL_PREFIX}")
 MESSAGE(STATUS "Build Examples:     ${BUILD_EXAMPLES}")
+MESSAGE(STATUS "Build Shared:       ${BUILD_SHARED}")
 IF(Qt5Widgets_FOUND)
   MESSAGE(STATUS "QT Version:         ${Qt5Widgets_VERSION_STRING}")
   MESSAGE(STATUS "QT INCLUDE DIRS:    ${Qt5Widgets_INCLUDE_DIRS}")

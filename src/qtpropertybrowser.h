@@ -158,7 +158,7 @@ protected Q_SLOTS:
 };
 
 template <class PropertyManager>
-class QT_QTPROPERTYBROWSER_EXPORT QtAbstractEditorFactory : public QtAbstractEditorFactoryBase
+class QtAbstractEditorFactory : public QtAbstractEditorFactoryBase
 {
 public:
     explicit QtAbstractEditorFactory(QObject *parent) : QtAbstractEditorFactoryBase(parent) {}
