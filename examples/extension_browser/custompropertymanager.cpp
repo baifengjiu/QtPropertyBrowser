@@ -20,6 +20,14 @@ TablePropertyManager::~TablePropertyManager()
 void TablePropertyManager::setModel(QtProperty* property, QAbstractTableModel* model)
 {
     propertyToValue_[property].model = model;
+    connect(model, &QAbstractTableModel::dataChanged, this,
+            [property, this](const QModelIndex& topLeft,
+                             const QModelIndex& bottomRight,
+                             const QVector<int>& roles = QVector<int>())
+    {
+        if (roles.contains(Qt::DisplayRole))
+            emit valueChanged(property, topLeft);
+    });
 }
 
 QAbstractTableModel* TablePropertyManager::model(const QtProperty* property) const
@@ -51,6 +59,17 @@ QMap<uint8_t, QAbstractItemDelegate*> TablePropertyManager::itemDelegates(QtProp
     return data.delegates;
 }
 
+void TablePropertyManager::setSelectedIndex(QtProperty* property, const QModelIndex& index)
+{
+    propertyToValue_[property].index = index;
+}
+
+QModelIndex TablePropertyManager::selectedIndex(QtProperty* property)
+{
+    const auto& data = propertyToValue_.value(property);
+    return data.index;
+}
+
 void TablePropertyManager::initializeProperty(QtProperty* property)
 {
     propertyToValue_[property] = TablePropertyManager::Data();
@@ -58,7 +77,9 @@ void TablePropertyManager::initializeProperty(QtProperty* property)
 
 void TablePropertyManager::uninitializeProperty(QtProperty* property)
 {
+    const auto& data = propertyToValue_.value(property);
     propertyToValue_.remove(property);
+    disconnect(data.model);
 }
 
 /**

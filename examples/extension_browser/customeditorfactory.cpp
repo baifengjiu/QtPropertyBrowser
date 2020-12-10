@@ -61,6 +61,14 @@ QWidget* TableEditorFactory::createEditor(TablePropertyManager* manager, QtPrope
     data_->editorToProperty.insert(table, property);
 
     connect(table, SIGNAL(destroyed(QObject*)), this, SLOT(slotEditorDestroyed(QObject*)));
+    connect(table, &QTableView::clicked, this, [manager, property](const QModelIndex& index) {
+        manager->setSelectedIndex(property, index);
+        emit manager->clicked(property, index);
+    });
+    connect(table, &QTableView::doubleClicked, this, [manager, property](const QModelIndex& index) {
+        manager->setSelectedIndex(property, index);
+        emit manager->dbClicked(property, index);
+    });
 
     return table;
 }
@@ -121,6 +129,7 @@ QWidget* LineEditWithButtonEditorFactory::createEditor(LineEditWithButtonPropert
 {
     LineEditWithButton* lineEdit = new LineEditWithButton(parent);
     lineEdit->setClearButtonVisible(false);
+    lineEdit->setText(manager->value(property));
 
     auto it = data_->createdEditors.find(property);
     if (it == data_->createdEditors.end())
@@ -134,6 +143,8 @@ QWidget* LineEditWithButtonEditorFactory::createEditor(LineEditWithButtonPropert
     connect(lineEdit, SIGNAL(textEdited(QString)), this, SLOT(slotSetValue(QString)));
     connect(lineEdit, SIGNAL(destroyed(QObject*)), this, SLOT(slotEditorDestroyed(QObject*)));
     connect(lineEdit, &LineEditWithButton::buttonClicked, [lineEdit, dlg]() {
+        if (!dlg)
+            return;
         if (dlg->exec() == QDialog::Accepted)
         {
             auto text = dlg->getValue();

@@ -5,6 +5,7 @@
 #include <QAbstractItemDelegate>
 #include <QMap>
 #include <QDialog>
+#include <QString>
 
 /**
  * TablePropertyManager
@@ -24,6 +25,14 @@ public:
 
     void setItemDelegates(QtProperty* property, QMap<uint8_t, QAbstractItemDelegate*> delegates);
     QMap<uint8_t, QAbstractItemDelegate*> itemDelegates(QtProperty* property);
+
+    void setSelectedIndex(QtProperty* property, const QModelIndex& index);
+    QModelIndex selectedIndex(QtProperty* property);
+
+Q_SIGNALS:
+    void valueChanged(QtProperty* property, const QModelIndex& index);
+    void dbClicked(QtProperty* property, const QModelIndex& index);
+    void clicked(QtProperty* property, const QModelIndex& index);
 
 protected:
     void initializeProperty(QtProperty* property) override;

@@ -49,7 +49,6 @@ protected Q_SLOTS:
     void slotSetValue(const QString&);
 
 private:
-
     struct Impl;
     QScopedPointer<Impl> data_;
 };
