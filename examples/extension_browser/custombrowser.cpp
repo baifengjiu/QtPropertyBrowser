@@ -173,8 +173,8 @@ void CustomBrowserPrivate::propertyInserted(QtBrowserItem* index, QtBrowserItem*
         parentWidget = parentItem->container;
     }
 
-    //这样判断会导致出错
-    if (m_lableVisible.value(index->property(), true))
+    bool isCreateLable = m_lableVisible.value(index->property(), true);
+    if (isCreateLable)
     {
         newItem->label = new QLabel(parentWidget);
         newItem->label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
@@ -198,12 +198,12 @@ void CustomBrowserPrivate::propertyInserted(QtBrowserItem* index, QtBrowserItem*
 
     insertRow(layout, row);
     int span = 2;
-    if (newItem->label && newItem->widget)
+    if (isCreateLable && newItem->widget)
         span = 1;
 
     if (newItem->widget)
         layout->addWidget(newItem->widget, row, 1, span, 1);
-    if (newItem->label)
+    if (isCreateLable)
     {
         if (span == 2)
         {

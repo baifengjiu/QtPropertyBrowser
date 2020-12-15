@@ -90,6 +90,19 @@ void MainWindow::selectedChanged(const QModelIndex& index)
         doubleManager_->setValue(item12, currentItem_->maximum);
         root2_->addSubProperty(item12);
         addProperty(item12);
+
+        auto item = enumMapManager_->addProperty("map");
+        QMap<int, QString> map{
+            {0,"00"},
+            {1,"01"},
+            {2,"10"},
+            {3,"11"}
+        };
+
+        enumMapManager_->setEnumNames(item, map);
+        enumMapManager_->setValue(item, { 0,2 });
+        root2_->addSubProperty(item);
+        addProperty(item);
     }
 
     QList<QAction*> actions;
@@ -236,6 +249,10 @@ void MainWindow::valueChanged(QtProperty* property, const QString& value)
     model_->refresh(ui->tableView->selectionModel()->currentIndex().row());
 }
 
+void MainWindow::valueChanged(QtProperty* property, const QList<int>& value)
+{
+}
+
 void MainWindow::init()
 {
     model_ = new TableModel(ui->tableView);
@@ -253,12 +270,17 @@ void MainWindow::init()
     lineManager_ = new LineEditWithButtonPropertyManager(this);
     textManager_ = new TextEditPropertyManager(this);
 
+    enumMapManager_ = new EnumMapPropertyManager(this);
+
     connect(boolManager_, SIGNAL(valueChanged(QtProperty*, bool)), this, SLOT(valueChanged(QtProperty*, bool)));
     connect(intManager_, SIGNAL(valueChanged(QtProperty*, int)), this, SLOT(valueChanged(QtProperty*, int)));
     connect(doubleManager_, SIGNAL(valueChanged(QtProperty*, double)), this, SLOT(valueChanged(QtProperty*, double)));
     connect(stringManager_, SIGNAL(valueChanged(QtProperty*, const QString&)), this, SLOT(valueChanged(QtProperty*, const QString&)));
     connect(enumManager_, SIGNAL(valueChanged(QtProperty*, int)), this, SLOT(valueChanged(QtProperty*, int)));
     connect(textManager_, SIGNAL(valueChanged(QtProperty*, const QString&)), this, SLOT(valueChanged(QtProperty*, const QString&)));
+    connect(enumMapManager_, SIGNAL(valueChanged(QtProperty*, const QList<int>&)), this, SLOT(valueChanged(QtProperty*, const QList<int>&)));
+    //connect(tableManager_, SIGNAL(valueChanged(QtProperty*, const QModelIndex&)), this, SLOT(valueChanged(QtProperty*, const QModelIndex&)));
+    //connect(tableManager_, SIGNAL(clicked(QtProperty*, const QModelIndex&)), this, SLOT(clicked(QtProperty*, const QModelIndex&)));
 
     QtCheckBoxFactory* checkBoxFactory = new QtCheckBoxFactory(this);
     QtDoubleSpinBoxFactory* spinBoxFactory = new QtDoubleSpinBoxFactory(this);
@@ -268,6 +290,7 @@ void MainWindow::init()
     TableEditorFactory* tableFactory = new TableEditorFactory(this);
     LineEditWithButtonEditorFactory* lineFactory = new LineEditWithButtonEditorFactory(this);
     TextEditFactory* textBrowserFactory = new TextEditFactory(this);
+    EnumMapFactory* enumMapFactory = new EnumMapFactory(this);
 
     ui->custombrowser->setFactoryForManager(boolManager_, checkBoxFactory);
     ui->custombrowser->setFactoryForManager(intManager_, intFactory);
@@ -277,6 +300,7 @@ void MainWindow::init()
     ui->custombrowser->setFactoryForManager(tableManager_, tableFactory);
     ui->custombrowser->setFactoryForManager(lineManager_, lineFactory);
     ui->custombrowser->setFactoryForManager(textManager_, textBrowserFactory);
+    ui->custombrowser->setFactoryForManager(enumMapManager_, enumMapFactory);
 }
 
 void MainWindow::addProperty(QtProperty* property)

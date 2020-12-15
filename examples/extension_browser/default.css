@@ -52,3 +52,23 @@ LineEditWithButton {
 #ValueWidget[level="Error"] {
     border: 1px solid #ff0000;
 }
+
+EnumMapEdit #LineEdit_Item {
+    background-color: #FFFFFF;
+    color: #686868;
+}
+
+EnumMapEdit #LineEdit_Item:hover {
+    color: #000000;
+}
+
+EnumMapEdit #LineEdit_DropMenu {
+    background-color: #FFFFFF;
+}
+
+EnumMapEdit #LineEdit_Drop {
+    background-color: #FFFFFF;
+    width: 10px;
+    height: 10px;
+    border-radius: 4px;
+}

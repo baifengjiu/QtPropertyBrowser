@@ -74,7 +74,33 @@ private Q_SLOTS:
     void slotEditorDestroyed(QObject*);
 
 private:
+    struct Impl;
+    QScopedPointer<Impl> data_;
+};
 
+/**
+ * EnumMapFactory
+ */
+class EnumMapFactory : public QtAbstractEditorFactory<EnumMapPropertyManager>
+{
+    Q_OBJECT
+public:
+    EnumMapFactory(QObject* parent = 0);
+    ~EnumMapFactory();
+
+protected:
+    void connectPropertyManager(EnumMapPropertyManager* manager) override;
+    QWidget* createEditor(EnumMapPropertyManager* manager, QtProperty* property, QWidget* parent) override;
+    void disconnectPropertyManager(EnumMapPropertyManager* manager) override;
+
+private Q_SLOTS:
+    void slotPropertyChanged(QtProperty*, const QList<int>& value);
+    void slotSetValue(const QList<int>& value);
+    void slotEnumNamesChanged(QtProperty* property, const QMap<int, QString>& names);
+    void slotSepChanged(QtProperty* property, char sep);
+    void slotEditorDestroyed(QObject*);
+
+private:
     struct Impl;
     QScopedPointer<Impl> data_;
 };

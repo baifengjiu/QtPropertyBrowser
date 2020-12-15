@@ -1,10 +1,12 @@
 #include "custompropertymanager.h"
+#include <algorithm>    // equal
 
 struct TablePropertyManager::Data
 {
     QAbstractTableModel* model{ nullptr };
     QMap<uint8_t, QAbstractItemDelegate*> delegates;
     QMap<Qt::Orientation, bool> headerVisible;
+    QModelIndex index;
 };
 
 TablePropertyManager::TablePropertyManager(QObject* parent)
@@ -178,6 +180,107 @@ void TextEditPropertyManager::initializeProperty(QtProperty* property)
 }
 
 void TextEditPropertyManager::uninitializeProperty(QtProperty* property)
+{
+    propertyToValue_.remove(property);
+}
+
+/**
+ * EnumMapPropertyManager
+ */
+struct EnumMapPropertyManager::Data
+{
+    QList<int> values;
+    QMap<int, QString> enumNames;
+    char sep = ',';
+};
+
+EnumMapPropertyManager::EnumMapPropertyManager(QObject* parent)
+    : QtAbstractPropertyManager(parent)
+{
+
+}
+
+EnumMapPropertyManager::~EnumMapPropertyManager()
+{
+    clear();
+}
+
+QList<int> EnumMapPropertyManager::value(const QtProperty* property) const
+{
+    const auto& value = propertyToValue_.value(property);
+    return value.values;
+}
+
+QMap<int, QString> EnumMapPropertyManager::enumNames(const QtProperty* property) const
+{
+    const auto& value =  propertyToValue_.value(property);
+    return value.enumNames;
+}
+
+char EnumMapPropertyManager::sep(const QtProperty* property) const
+{
+    const auto& value = propertyToValue_.value(property);
+    return value.sep;
+}
+
+void EnumMapPropertyManager::setEnumNames(QtProperty* property, const QMap<int, QString>& names)
+{
+    auto it = propertyToValue_.find(property);
+    if(it == propertyToValue_.end())
+        return;
+    auto& data = it.value();
+
+    if(data.enumNames == names)
+        return;
+
+    data.enumNames = names;
+    data.values.clear();
+
+    emit enumNamesChanged(property, data.enumNames);
+
+    emit propertyChanged(property);
+    emit valueChanged(property, data.values);
+}
+
+
+void EnumMapPropertyManager::setValue(QtProperty* property, const QList<int>& value)
+{
+    auto it = propertyToValue_.find(property);
+    if (it == propertyToValue_.end())
+        return;
+
+    auto& data = it.value();
+
+    if(data.values == value)
+        return;
+
+    data.values = value;
+
+    emit propertyChanged(property);
+    emit valueChanged(property, data.values);
+}
+
+void EnumMapPropertyManager::setSep(QtProperty* property, const char sep)
+{
+    auto it = propertyToValue_.find(property);
+    if (it == propertyToValue_.end())
+        return;
+    auto& data = it.value();
+
+    if (data.sep == sep)
+        return;
+    data.sep = sep;
+
+    emit sepChanged(property, sep);
+}
+
+
+void EnumMapPropertyManager::initializeProperty(QtProperty* property)
+{
+    propertyToValue_[property] = EnumMapPropertyManager::Data();
+}
+
+void EnumMapPropertyManager::uninitializeProperty(QtProperty* property)
 {
     propertyToValue_.remove(property);
 }

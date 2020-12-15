@@ -112,3 +112,36 @@ private:
     struct Data;
     QMap<const QtProperty*, Data> propertyToValue_;
 };
+
+/**
+ * EnumMapPropertyManager
+ */
+class EnumMapPropertyManager : public QtAbstractPropertyManager
+{
+    Q_OBJECT
+public: 
+    EnumMapPropertyManager(QObject* parent);
+    ~EnumMapPropertyManager();
+
+    QList<int> value(const QtProperty* property) const;
+    QMap<int, QString> enumNames(const QtProperty* property) const;
+    char sep(const QtProperty* property) const;
+
+public Q_SLOTS:
+    void setEnumNames(QtProperty* property, const QMap<int, QString>& names);
+    void setValue(QtProperty* property, const QList<int>& value);
+    void setSep(QtProperty* property, const char sep); // ·Ö¸î·û£¬Ä¬ÈÏ','
+
+Q_SIGNALS:
+    void valueChanged(QtProperty* property, const QList<int>& value);
+    void enumNamesChanged(QtProperty* property, const QMap<int, QString>& names);
+    void sepChanged(QtProperty* property, char sep);
+
+protected:
+    void initializeProperty(QtProperty* property) override;
+    void uninitializeProperty(QtProperty* property) override;
+
+private:
+    struct Data;
+    QMap<const QtProperty*, Data> propertyToValue_;
+};

@@ -24,6 +24,7 @@ private Q_SLOTS:
     void valueChanged(QtProperty* property, int value);
     void valueChanged(QtProperty* property, double value);
     void valueChanged(QtProperty* property, const QString& value);
+    void valueChanged(QtProperty* property, const QList<int>& value);
 
 private:
     void init();
@@ -51,6 +52,7 @@ private:
     TablePropertyManager* tableManager_;
     LineEditWithButtonPropertyManager* lineManager_;
     TextEditPropertyManager* textManager_;
+    EnumMapPropertyManager* enumMapManager_;
 
     QtProperty* root2_;
 

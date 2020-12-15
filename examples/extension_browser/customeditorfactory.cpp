@@ -1,11 +1,11 @@
 #include "customeditorfactory.h"
 #include "lineeditwithbutton.h"
+#include "enummapedit.h"
 
 #include <QTableView>
 #include <QHeaderView>
 #include <QTextEdit>
 #include <QDialog>
-
 
 /**
  * TableEditorFactory
@@ -19,7 +19,6 @@ struct TableEditorFactory::Impl {
     PropertyToEditorListMap  createdEditors;
     EditorToPropertyMap editorToProperty;
 };
-
 
 TableEditorFactory::TableEditorFactory(QObject* parent)
     : QtAbstractEditorFactory<TablePropertyManager>(parent)
@@ -114,7 +113,6 @@ LineEditWithButtonEditorFactory::LineEditWithButtonEditorFactory(QObject* parent
 {
 }
 
-
 LineEditWithButtonEditorFactory::~LineEditWithButtonEditorFactory()
 {
     qDeleteAll(data_->editorToProperty.keys());
@@ -166,8 +164,11 @@ void LineEditWithButtonEditorFactory::slotPropertyChanged(QtProperty* property, 
         return;
 
     for (auto editor : it.value()) {
-        if (editor->text() != value)
+        if (editor->text() != value) {
+            editor->blockSignals(true);
             editor->setText(value);
+            editor->blockSignals(false);
+        }
     }
 }
 
@@ -268,7 +269,11 @@ void TextEditFactory::slotPropertyChanged(QtProperty* property, const QString& v
 
     for (QTextEdit* editor : it.value()) {
         if (editor->toPlainText() != value)
+        {
+            editor->blockSignals(true);
             editor->setText(value);
+            editor->blockSignals(false);
+        }
     }
 }
 
@@ -289,6 +294,136 @@ void TextEditFactory::slotSetValue(const QString& value)
 }
 
 void TextEditFactory::slotEditorDestroyed(QObject* object)
+{
+    const auto ecend = data_->editorToProperty.end();
+    for (auto itEditor = data_->editorToProperty.begin(); itEditor != ecend; ++itEditor) {
+        if (itEditor.key() == object) {
+            auto widget = itEditor.key();
+            QtProperty* property = itEditor.value();
+            const auto pit = data_->createdEditors.find(property);
+            if (pit != data_->createdEditors.end()) {
+                pit.value().removeAll(widget);
+                if (pit.value().isEmpty())
+                    data_->createdEditors.erase(pit);
+            }
+            data_->editorToProperty.erase(itEditor);
+            //itEditor.key()->deleteLater();
+            return;
+        }
+    }
+}
+
+/**
+ * EnumMapFactory
+ */
+struct EnumMapFactory::Impl {
+    typedef QList<EnumMapEdit*> EditorList;
+    typedef QMap<QtProperty*, EditorList> PropertyToEditorListMap;
+    typedef QMap<EnumMapEdit*, QtProperty*> EditorToPropertyMap;
+
+    PropertyToEditorListMap  createdEditors;
+    EditorToPropertyMap editorToProperty;
+};
+
+EnumMapFactory::EnumMapFactory(QObject* parent)
+    : QtAbstractEditorFactory<EnumMapPropertyManager>(parent)
+    , data_(new Impl)
+{
+}
+EnumMapFactory::~EnumMapFactory()
+{
+    qDeleteAll(data_->editorToProperty.keys());
+}
+
+void EnumMapFactory::connectPropertyManager(EnumMapPropertyManager* manager)
+{
+    connect(manager, SIGNAL(valueChanged(QtProperty*, const QList<int>&)), this, SLOT(slotPropertyChanged(QtProperty*, const QList<int>&)));
+    connect(manager, SIGNAL(enumNamesChanged(QtProperty*, const QMap<int, QString>&)), this, SLOT(slotEnumNamesChanged(QtProperty*, const QMap<int, QString>&)));
+}
+
+QWidget* EnumMapFactory::createEditor(EnumMapPropertyManager* manager, QtProperty* property, QWidget* parent)
+{
+    EnumMapEdit* editor = new EnumMapEdit(parent);
+    // editor->setReadOnly(true);
+
+    auto it = data_->createdEditors.find(property);
+    if (it == data_->createdEditors.end())
+    {
+        it = data_->createdEditors.insert(property, Impl::EditorList());
+    }
+    it.value().append(editor);
+    data_->editorToProperty.insert(editor, property);
+
+    auto names = manager->enumNames(property);
+    auto values = manager->value(property);
+    editor->setDropDownData(names);
+    editor->setValues(values);
+    connect(editor, SIGNAL(valueChanged(QList<int>)), this, SLOT(slotSetValue(QList<int>)));
+    connect(editor, SIGNAL(destroyed(QObject*)), this, SLOT(slotEditorDestroyed(QObject*)));
+    return editor;
+}
+
+void EnumMapFactory::disconnectPropertyManager(EnumMapPropertyManager* manager)
+{
+    connect(manager, SIGNAL(valueChanged(QtProperty*, const QList<int>&)), this, SLOT(slotPropertyChanged(QtProperty*, const QList<int>&)));
+    connect(manager, SIGNAL(enumNamesChanged(QtProperty*, const QMap<int, QString>&)), this, SLOT(slotEnumNamesChanged(QtProperty*, const QMap<int, QString>&)));
+    connect(manager, SIGNAL(sepChanged(QtProperty*, QStringList)), this, SLOT(slotSepChanged(QtProperty*, QStringList)));
+}
+
+void EnumMapFactory::slotPropertyChanged(QtProperty* property, const QList<int>& value)
+{
+    const auto it = data_->createdEditors.constFind(property);
+    if (it == data_->createdEditors.constEnd())
+        return;
+
+    for (EnumMapEdit* editor : it.value()) {
+        editor->blockSignals(true);
+        editor->setValues(value);
+        editor->blockSignals(false);
+    }
+}
+
+void EnumMapFactory::slotSetValue(const QList<int>& value)
+{
+    QObject* object = sender();
+    const auto ecend = data_->editorToProperty.constEnd();
+    for (auto itEditor = data_->editorToProperty.constBegin(); itEditor != ecend; ++itEditor)
+        if (itEditor.key() == object)
+        {
+            QtProperty* property = itEditor.value();
+            EnumMapPropertyManager* manager = propertyManager(property);
+            if (!manager)
+                return;
+            manager->setValue(property, value);
+            return;
+        }
+}
+
+void EnumMapFactory::slotEnumNamesChanged(QtProperty* property, const QMap<int, QString>& names)
+{
+    const auto it = data_->createdEditors.constFind(property);
+    if (it == data_->createdEditors.constEnd())
+        return;
+    for (EnumMapEdit* editor : it.value()) {
+        editor->blockSignals(true);
+        editor->setDropDownData(names);
+        editor->blockSignals(false);
+    }
+}
+
+void EnumMapFactory::slotSepChanged(QtProperty* property, char sep)
+{
+    const auto it = data_->createdEditors.constFind(property);
+    if (it == data_->createdEditors.constEnd())
+        return;
+    for (EnumMapEdit* editor : it.value()) {
+        editor->blockSignals(true);
+        editor->setSep(sep);
+        editor->blockSignals(false);
+    }
+}
+
+void EnumMapFactory::slotEditorDestroyed(QObject* object)
 {
     const auto ecend = data_->editorToProperty.end();
     for (auto itEditor = data_->editorToProperty.begin(); itEditor != ecend; ++itEditor) {

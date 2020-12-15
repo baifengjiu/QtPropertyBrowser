@@ -8,5 +8,6 @@
         <file>images/addItem.png</file>
         <file>images/deleteItem.png</file>
         <file>images/preferenceOpenFile.png</file>
+        <file>images/control-button-more.png</file>
     </qresource>
 </RCC>
