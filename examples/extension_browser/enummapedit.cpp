@@ -14,7 +14,7 @@
 #include <QResizeEvent>
 #include <QListView>
 
-EnumMapEdit::EnumMapEdit(QWidget *parent)
+EnumMapEdit::EnumMapEdit(QWidget* parent)
     : QWidget(parent)
     , m_menu(nullptr)
     , m_btnDropDown(nullptr)
@@ -66,7 +66,7 @@ void EnumMapEdit::setShowWayCallBack(CallBackFunc callBack, ParseCallBackFunc pa
     m_parseCallBackFunc = parseCallBack;
 }
 
-bool EnumMapEdit::eventFilter(QObject * watched, QEvent * event)
+bool EnumMapEdit::eventFilter(QObject* watched, QEvent* event)
 {
     if (watched == m_menu)
     {
@@ -100,7 +100,7 @@ bool EnumMapEdit::eventFilter(QObject * watched, QEvent * event)
     return QWidget::eventFilter(watched, event);
 }
 
-void EnumMapEdit::paintEvent(QPaintEvent *e)
+void EnumMapEdit::paintEvent(QPaintEvent* e)
 {
     QStylePainter painter(this);
     QStyleOption opt;
@@ -109,6 +109,12 @@ void EnumMapEdit::paintEvent(QPaintEvent *e)
     painter.drawPrimitive(QStyle::PE_Widget, opt);
 
     QWidget::paintEvent(e);
+}
+
+void EnumMapEdit::resizeEvent(QResizeEvent* e)
+{
+    m_btnDropDown->setFixedHeight(e->size().height() - 2);
+    QWidget::resizeEvent(e);
 }
 
 void EnumMapEdit::setDropDownData(QMap<int, QString> enumMaps)
@@ -124,7 +130,7 @@ void EnumMapEdit::setDropDownData(QMap<int, QString> enumMaps)
         QWidget* widget = new QWidget(m_menu);
         QHBoxLayout* layout = new QHBoxLayout(widget);
         layout->setMargin(0);
-        QCheckBox *box = new QCheckBox(widget);
+        QCheckBox* box = new QCheckBox(widget);
         box->setObjectName("LineEdit_Item");
         box->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
         m_buttonGroup->addButton(box);
@@ -144,7 +150,7 @@ void EnumMapEdit::initContent()
 {
     m_btnDropDown = new QPushButton(this);
     m_btnDropDown->setObjectName("LineEdit_Drop");
-    m_btnDropDown->setText(" ... ");
+    m_btnDropDown->setText(QStringLiteral("···"));
     m_btnDropDown->installEventFilter(this);
     m_leContent = new QLineEdit(this);
     m_leContent->installEventFilter(this);
@@ -182,7 +188,7 @@ void EnumMapEdit::initLayout()
     QHBoxLayout* hLineLayout = new QHBoxLayout(m_leContent);
     m_leContent->setTextMargins(0, 2, m_btnDropDown->width(), 0);
     hLineLayout->setMargin(0);
-    hLineLayout->setContentsMargins(1, 0, 0, 0);
+    hLineLayout->setContentsMargins(1, 0, 1, 0);
     hLineLayout->addItem(new QSpacerItem(20, 20, QSizePolicy::Expanding, QSizePolicy::Minimum));
     hLineLayout->setSpacing(0);
     hLineLayout->addWidget(m_btnDropDown);
@@ -309,6 +315,6 @@ void EnumMapEdit::setValues(QList<int> values)
     m_leContent->setText(m_showCallBackFunc(dataList));
     if (!m_menu->isHidden())
     {
-        subMenuActionShow();
+       // subMenuActionShow();
     }
 }

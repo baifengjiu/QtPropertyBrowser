@@ -202,7 +202,7 @@ void CustomBrowserPrivate::propertyInserted(QtBrowserItem* index, QtBrowserItem*
         span = 1;
 
     if (newItem->widget)
-        layout->addWidget(newItem->widget, row, 1, span, 1);
+        layout->addWidget(newItem->widget, row, span == 2 ? 0 : 1, 1, span);
     if (isCreateLable)
     {
         if (span == 2)

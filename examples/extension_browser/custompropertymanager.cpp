@@ -1,11 +1,11 @@
 #include "custompropertymanager.h"
-#include <algorithm>    // equal
 
 struct TablePropertyManager::Data
 {
     QAbstractTableModel* model{ nullptr };
     QMap<uint8_t, QAbstractItemDelegate*> delegates;
     QMap<Qt::Orientation, bool> headerVisible;
+    QMap<uint8_t, uint8_t> colWidths;
     QModelIndex index;
 };
 
@@ -27,8 +27,7 @@ void TablePropertyManager::setModel(QtProperty* property, QAbstractTableModel* m
                              const QModelIndex& bottomRight,
                              const QVector<int>& roles = QVector<int>())
     {
-        if (roles.contains(Qt::DisplayRole))
-            emit valueChanged(property, topLeft);
+        emit valueChanged(property, topLeft);
     });
 }
 
@@ -46,7 +45,6 @@ void TablePropertyManager::setHeaderVisible(const QtProperty* property, Qt::Orie
 bool TablePropertyManager::headerVisible(const QtProperty* property, Qt::Orientation orientation) const
 {
     const auto& data = propertyToValue_.value(property);
-
     return data.headerVisible.value(orientation, true);
 }
 
@@ -59,6 +57,17 @@ QMap<uint8_t, QAbstractItemDelegate*> TablePropertyManager::itemDelegates(QtProp
 {
     const auto& data = propertyToValue_.value(property);
     return data.delegates;
+}
+
+void  TablePropertyManager::setColWidth(QtProperty* property, QMap<uint8_t, uint8_t> colWidths)
+{
+    propertyToValue_[property].colWidths = colWidths;
+}
+
+QMap<uint8_t, uint8_t>  TablePropertyManager::itemColWidth(QtProperty* property)
+{
+    const auto& data = propertyToValue_.value(property);
+    return data.colWidths;
 }
 
 void TablePropertyManager::setSelectedIndex(QtProperty* property, const QModelIndex& index)
@@ -89,7 +98,7 @@ void TablePropertyManager::uninitializeProperty(QtProperty* property)
  */
 struct LineEditWithButtonPropertyManager::Data
 {
-    CustomDialog* dlg{ nullptr };
+    std::function<bool(QString&)> func{ nullptr };
     QString val;
 };
 
@@ -97,19 +106,20 @@ LineEditWithButtonPropertyManager::LineEditWithButtonPropertyManager(QObject* pa
     : QtAbstractPropertyManager(parent)
 {
 }
+
 LineEditWithButtonPropertyManager::~LineEditWithButtonPropertyManager()
 {
     clear();
 }
 
-void LineEditWithButtonPropertyManager::addPopupDialog(QtProperty* property, CustomDialog* dlg)
+void LineEditWithButtonPropertyManager::addClickedHandle(QtProperty* property, std::function<bool(QString&)> func)
 {
-    propertyToValue_[property].dlg = dlg;
+    propertyToValue_[property].func = func;
 }
 
-CustomDialog* LineEditWithButtonPropertyManager::popupDialog(QtProperty* property)
+std::function<bool(QString&)> LineEditWithButtonPropertyManager::clickedHuandle(QtProperty* property)
 {
-    return propertyToValue_.value(property).dlg;
+    return propertyToValue_.value(property).func;
 }
 
 void LineEditWithButtonPropertyManager::setValue(QtProperty* property, const QString& val)
@@ -197,7 +207,6 @@ struct EnumMapPropertyManager::Data
 EnumMapPropertyManager::EnumMapPropertyManager(QObject* parent)
     : QtAbstractPropertyManager(parent)
 {
-
 }
 
 EnumMapPropertyManager::~EnumMapPropertyManager()
@@ -213,7 +222,7 @@ QList<int> EnumMapPropertyManager::value(const QtProperty* property) const
 
 QMap<int, QString> EnumMapPropertyManager::enumNames(const QtProperty* property) const
 {
-    const auto& value =  propertyToValue_.value(property);
+    const auto& value = propertyToValue_.value(property);
     return value.enumNames;
 }
 
@@ -226,11 +235,11 @@ char EnumMapPropertyManager::sep(const QtProperty* property) const
 void EnumMapPropertyManager::setEnumNames(QtProperty* property, const QMap<int, QString>& names)
 {
     auto it = propertyToValue_.find(property);
-    if(it == propertyToValue_.end())
+    if (it == propertyToValue_.end())
         return;
     auto& data = it.value();
 
-    if(data.enumNames == names)
+    if (data.enumNames == names)
         return;
 
     data.enumNames = names;
@@ -242,7 +251,6 @@ void EnumMapPropertyManager::setEnumNames(QtProperty* property, const QMap<int, 
     emit valueChanged(property, data.values);
 }
 
-
 void EnumMapPropertyManager::setValue(QtProperty* property, const QList<int>& value)
 {
     auto it = propertyToValue_.find(property);
@@ -251,7 +259,7 @@ void EnumMapPropertyManager::setValue(QtProperty* property, const QList<int>& va
 
     auto& data = it.value();
 
-    if(data.values == value)
+    if (data.values == value)
         return;
 
     data.values = value;
@@ -273,7 +281,6 @@ void EnumMapPropertyManager::setSep(QtProperty* property, const char sep)
 
     emit sepChanged(property, sep);
 }
-
 
 void EnumMapPropertyManager::initializeProperty(QtProperty* property)
 {

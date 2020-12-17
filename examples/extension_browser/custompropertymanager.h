@@ -4,7 +4,6 @@
 #include <QAbstractTableModel>
 #include <QAbstractItemDelegate>
 #include <QMap>
-#include <QDialog>
 #include <QString>
 
 /**
@@ -26,6 +25,9 @@ public:
     void setItemDelegates(QtProperty* property, QMap<uint8_t, QAbstractItemDelegate*> delegates);
     QMap<uint8_t, QAbstractItemDelegate*> itemDelegates(QtProperty* property);
 
+    void setColWidth(QtProperty* property, QMap<uint8_t, uint8_t> colWidths);
+    QMap<uint8_t, uint8_t> itemColWidth(QtProperty* property);
+
     void setSelectedIndex(QtProperty* property, const QModelIndex& index);
     QModelIndex selectedIndex(QtProperty* property);
 
@@ -46,14 +48,6 @@ private:
 /**
  * LineEditWithButtonPropertyManager
  */
-class CustomDialog :public QDialog
-{
-public:
-    CustomDialog(QWidget* parent = nullptr) :QDialog(parent) {}
-
-    virtual QString getValue() const = 0;
-};
-
 class LineEditWithButtonPropertyManager : public QtAbstractPropertyManager
 {
     Q_OBJECT
@@ -62,12 +56,12 @@ public:
     ~LineEditWithButtonPropertyManager();
 
     /**
-     * @brief:     添加按钮点击触发的弹出框
+     * @brief:     Add event triggered by button click
      * @param[in]: QtProperty * property
-     * @param[in]: CustomDialog * dlg   自定义的弹出框
+     * @param[in]: std::function<bool(QString&)>  bool:Confirm/Cancel QString:out parameter.Determine the modified value.
      */
-    void addPopupDialog(QtProperty* property, CustomDialog* dlg);
-    CustomDialog* popupDialog(QtProperty* property);
+    void addClickedHandle(QtProperty* property, std::function<bool(QString&)>);
+    std::function<bool(QString&)> clickedHuandle(QtProperty* property);
 
     QString value(const QtProperty* property) const;
 
@@ -119,7 +113,7 @@ private:
 class EnumMapPropertyManager : public QtAbstractPropertyManager
 {
     Q_OBJECT
-public: 
+public:
     EnumMapPropertyManager(QObject* parent);
     ~EnumMapPropertyManager();
 
@@ -130,7 +124,7 @@ public:
 public Q_SLOTS:
     void setEnumNames(QtProperty* property, const QMap<int, QString>& names);
     void setValue(QtProperty* property, const QList<int>& value);
-    void setSep(QtProperty* property, const char sep); // 分割符，默认','
+    void setSep(QtProperty* property, const char sep); // Separator, default ','
 
 Q_SIGNALS:
     void valueChanged(QtProperty* property, const QList<int>& value);

@@ -1,7 +1,7 @@
 #include "TestDialog.h"
 
 TestDialog::TestDialog(QWidget* parent)
-    :CustomDialog(parent)
+    :QDialog(parent)
 {
     ui = new Ui::TestDialog();
     ui->setupUi(this);

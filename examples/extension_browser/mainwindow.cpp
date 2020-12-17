@@ -52,8 +52,16 @@ void MainWindow::selectedChanged(const QModelIndex& index)
 
         QtProperty* item4 = lineManager_->addProperty("unit");
 
-        auto dlg = new TestDialog();
-        lineManager_->addPopupDialog(item4, dlg);
+        auto func = [](QString& value)->bool{
+            TestDialog dlg;
+            if(dlg.exec() == QDialog::Accepted)
+            {
+                value = dlg.getValue();
+                return true;
+            }
+            return false;
+        };
+        lineManager_->addClickedHandle(item4, func);
         root1_->addSubProperty(item4);
         addProperty(item4);
     }

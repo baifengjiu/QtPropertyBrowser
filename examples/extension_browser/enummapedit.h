@@ -18,7 +18,7 @@ class EnumMapEdit : public QWidget
     Q_OBJECT
 
 public:
-    EnumMapEdit(QWidget *parent = nullptr);
+    EnumMapEdit(QWidget* parent = nullptr);
     virtual ~EnumMapEdit();
     void setReadOnly(bool bEdit);
 
@@ -36,9 +36,9 @@ signals:
     void valueChanged(QList<int> valus);
 
 protected:
-    bool eventFilter(QObject *watched, QEvent *event) override;
-    void paintEvent(QPaintEvent *e) override;
-
+    bool eventFilter(QObject* watched, QEvent* event) override;
+    void paintEvent(QPaintEvent* e) override;
+    void resizeEvent(QResizeEvent* e) override;
 private:
     void initContent();
     void initLayout();

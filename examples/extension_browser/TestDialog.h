@@ -1,14 +1,14 @@
 #pragma once
-#include "customeditorfactory.h"
+#include <QDialog>
 #include "ui_TestDialog.h"
 
-class TestDialog :public CustomDialog
+class TestDialog :public QDialog
 {
 public:
     TestDialog(QWidget* parent = nullptr);
     ~TestDialog();
 
-    QString getValue() const override;
+    QString getValue() const;
 
 private:
     Ui::TestDialog* ui;

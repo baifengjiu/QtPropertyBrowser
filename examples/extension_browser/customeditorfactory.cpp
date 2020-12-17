@@ -10,7 +10,6 @@
 /**
  * TableEditorFactory
  */
-
 struct TableEditorFactory::Impl {
     typedef QList<QTableView*> EditorList;
     typedef QMap<QtProperty*, EditorList> PropertyToEditorListMap;
@@ -38,8 +37,12 @@ void TableEditorFactory::connectPropertyManager(TablePropertyManager* manager)
 QWidget* TableEditorFactory::createEditor(TablePropertyManager* manager, QtProperty* property, QWidget* parent)
 {
     QTableView* table = new QTableView(parent);
+    table->setMinimumHeight(115);
     table->setObjectName("EditorFactoryTable");
+    table->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
+    table->setSelectionBehavior(QAbstractItemView::SelectRows);
     table->horizontalHeader()->setStretchLastSection(true);
+    table->verticalHeader()->setDefaultSectionSize(24);
     table->setModel(manager->model(property));
     bool hv = manager->headerVisible(property, Qt::Orientation::Horizontal);
     table->horizontalHeader()->setVisible(hv);
@@ -49,6 +52,12 @@ QWidget* TableEditorFactory::createEditor(TablePropertyManager* manager, QtPrope
     for (auto it = map.cbegin(); it != map.cend(); it++)
     {
         table->setItemDelegateForColumn(it.key(), it.value());
+    }
+
+    auto widthsMap = manager->itemColWidth(property);
+    for (auto it = widthsMap.cbegin(); it != widthsMap.cend(); it++)
+    {
+        table->setColumnWidth(it.key(), it.value());
     }
 
     auto it = data_->createdEditors.find(property);
@@ -68,7 +77,9 @@ QWidget* TableEditorFactory::createEditor(TablePropertyManager* manager, QtPrope
         manager->setSelectedIndex(property, index);
         emit manager->dbClicked(property, index);
     });
-
+    connect(table->selectionModel(), &QItemSelectionModel::currentRowChanged, this, [manager, property](const QModelIndex& current, const QModelIndex& previous) {
+        manager->setSelectedIndex(property, current);
+    });
     return table;
 }
 
@@ -136,17 +147,18 @@ QWidget* LineEditWithButtonEditorFactory::createEditor(LineEditWithButtonPropert
     }
     it.value().append(lineEdit);
     data_->editorToProperty.insert(lineEdit, property);
-    auto dlg = manager->popupDialog(property);
 
-    connect(lineEdit, SIGNAL(textEdited(QString)), this, SLOT(slotSetValue(QString)));
+    connect(lineEdit, SIGNAL(textEdited(const QString&)), this, SLOT(slotSetValue(const QString&)));
     connect(lineEdit, SIGNAL(destroyed(QObject*)), this, SLOT(slotEditorDestroyed(QObject*)));
-    connect(lineEdit, &LineEditWithButton::buttonClicked, [lineEdit, dlg]() {
-        if (!dlg)
+    connect(lineEdit, &LineEditWithButton::buttonClicked, [lineEdit, manager, property]() {
+        auto func = manager->clickedHuandle(property);
+        if (!func)
             return;
-        if (dlg->exec() == QDialog::Accepted)
+        QString value;
+        if (func(value))
         {
-            auto text = dlg->getValue();
-            lineEdit->setText(text);
+            lineEdit->setText(value);
+            emit manager->valueChanged(property, value);
         }
     });
     return lineEdit;
@@ -164,11 +176,8 @@ void LineEditWithButtonEditorFactory::slotPropertyChanged(QtProperty* property, 
         return;
 
     for (auto editor : it.value()) {
-        if (editor->text() != value) {
-            editor->blockSignals(true);
+        if (editor->text() != value)
             editor->setText(value);
-            editor->blockSignals(false);
-        }
     }
 }
 
@@ -238,6 +247,8 @@ void TextEditFactory::connectPropertyManager(TextEditPropertyManager* manager)
 QWidget* TextEditFactory::createEditor(TextEditPropertyManager* manager, QtProperty* property, QWidget* parent)
 {
     QTextEdit* editor = new QTextEdit(parent);
+    editor->setMinimumHeight(100);
+    editor->setObjectName("EditorFactoryTextEdit");
     editor->setReadOnly(false);
     editor->setText(manager->value(property));
 
@@ -269,11 +280,7 @@ void TextEditFactory::slotPropertyChanged(QtProperty* property, const QString& v
 
     for (QTextEdit* editor : it.value()) {
         if (editor->toPlainText() != value)
-        {
-            editor->blockSignals(true);
             editor->setText(value);
-            editor->blockSignals(false);
-        }
     }
 }
 
@@ -307,7 +314,6 @@ void TextEditFactory::slotEditorDestroyed(QObject* object)
                     data_->createdEditors.erase(pit);
             }
             data_->editorToProperty.erase(itEditor);
-            //itEditor.key()->deleteLater();
             return;
         }
     }
@@ -330,6 +336,7 @@ EnumMapFactory::EnumMapFactory(QObject* parent)
     , data_(new Impl)
 {
 }
+
 EnumMapFactory::~EnumMapFactory()
 {
     qDeleteAll(data_->editorToProperty.keys());
@@ -339,12 +346,12 @@ void EnumMapFactory::connectPropertyManager(EnumMapPropertyManager* manager)
 {
     connect(manager, SIGNAL(valueChanged(QtProperty*, const QList<int>&)), this, SLOT(slotPropertyChanged(QtProperty*, const QList<int>&)));
     connect(manager, SIGNAL(enumNamesChanged(QtProperty*, const QMap<int, QString>&)), this, SLOT(slotEnumNamesChanged(QtProperty*, const QMap<int, QString>&)));
+    connect(manager, SIGNAL(sepChanged(QtProperty*, const char)), this, SLOT(slotSepChanged(QtProperty*, const char)));
 }
 
 QWidget* EnumMapFactory::createEditor(EnumMapPropertyManager* manager, QtProperty* property, QWidget* parent)
 {
     EnumMapEdit* editor = new EnumMapEdit(parent);
-    // editor->setReadOnly(true);
 
     auto it = data_->createdEditors.find(property);
     if (it == data_->createdEditors.end())
@@ -365,9 +372,9 @@ QWidget* EnumMapFactory::createEditor(EnumMapPropertyManager* manager, QtPropert
 
 void EnumMapFactory::disconnectPropertyManager(EnumMapPropertyManager* manager)
 {
-    connect(manager, SIGNAL(valueChanged(QtProperty*, const QList<int>&)), this, SLOT(slotPropertyChanged(QtProperty*, const QList<int>&)));
-    connect(manager, SIGNAL(enumNamesChanged(QtProperty*, const QMap<int, QString>&)), this, SLOT(slotEnumNamesChanged(QtProperty*, const QMap<int, QString>&)));
-    connect(manager, SIGNAL(sepChanged(QtProperty*, QStringList)), this, SLOT(slotSepChanged(QtProperty*, QStringList)));
+    disconnect(manager, SIGNAL(valueChanged(QtProperty*, const QList<int>&)), this, SLOT(slotPropertyChanged(QtProperty*, const QList<int>&)));
+    disconnect(manager, SIGNAL(enumNamesChanged(QtProperty*, const QMap<int, QString>&)), this, SLOT(slotEnumNamesChanged(QtProperty*, const QMap<int, QString>&)));
+    disconnect(manager, SIGNAL(sepChanged(QtProperty*, const char)), this, SLOT(slotSepChanged(QtProperty*, const char)));
 }
 
 void EnumMapFactory::slotPropertyChanged(QtProperty* property, const QList<int>& value)

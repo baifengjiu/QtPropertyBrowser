@@ -7,14 +7,17 @@ LineEditWithButton::LineEditWithButton(QWidget* parent)
     : QLineEdit(parent)
 {
     QHBoxLayout* layout = new QHBoxLayout(this);
-    m_btn = new QPushButton();
+    m_btn = new QPushButton(this);
     m_btn->setObjectName("LineEdit_Btn");
+    m_btn->setCursor(Qt::ArrowCursor);
     m_btn->setFlat(true);
+    m_btn->setText(QStringLiteral("···"));
     m_btn->setWindowOpacity(1);
     m_btn->setFixedSize(16, 16);
     m_btn->setMaximumWidth(16);
-    m_pbClear = new QPushButton();
+    m_pbClear = new QPushButton(this);
     m_pbClear->setObjectName("LineEdit_Clear");
+    m_pbClear->setCursor(Qt::ArrowCursor);
     m_pbClear->setFlat(true);
     m_pbClear->setWindowOpacity(1);
     m_pbClear->setFixedSize(16, 16);
@@ -25,7 +28,7 @@ LineEditWithButton::LineEditWithButton(QWidget* parent)
     layout->addItem(new QSpacerItem(20, 20, QSizePolicy::Expanding, QSizePolicy::Minimum));
     layout->addWidget(m_pbClear);
     layout->addWidget(m_btn);
-    layout->setContentsMargins(3, 0, 3, 0);
+    layout->setContentsMargins(1, 0, 1, 0);
     layout->setSpacing(0);
     connect(m_btn, &QPushButton::clicked, this, &LineEditWithButton::buttonClicked);
     connect(this, &QLineEdit::textEdited, this, &LineEditWithButton::onTextChanged);
@@ -40,8 +43,6 @@ LineEditWithButton::LineEditWithButton(QWidget* parent)
 
 LineEditWithButton::~LineEditWithButton()
 {
-    delete m_pbClear;
-    delete m_btn;
 }
 
 void LineEditWithButton::setClearButtonVisible(bool isVisible)
@@ -72,7 +73,7 @@ void LineEditWithButton::onTextChanged(const QString& str)
 
 void LineEditWithButton::resizeEvent(QResizeEvent* e)
 {
-    m_btn->setFixedHeight(e->size().height());
+    m_btn->setFixedHeight(e->size().height() - 2);
     QLineEdit::resizeEvent(e);
 }
 
