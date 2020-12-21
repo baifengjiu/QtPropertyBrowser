@@ -63,6 +63,9 @@ public:
     void addClickedHandle(QtProperty* property, std::function<bool(QString&)>);
     std::function<bool(QString&)> clickedHuandle(QtProperty* property);
 
+    void setReadOnly(QtProperty* property, bool readOnly);
+    bool readOnly(QtProperty* property);
+
     QString value(const QtProperty* property) const;
 
 public Q_SLOTS:
@@ -70,6 +73,7 @@ public Q_SLOTS:
 
 Q_SIGNALS:
     void valueChanged(QtProperty* property, const QString& val);
+    void readOnlyChanged(QtProperty* property, bool readOnly);
 
 protected:
     void initializeProperty(QtProperty* property) override;

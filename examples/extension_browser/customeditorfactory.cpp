@@ -132,6 +132,7 @@ LineEditWithButtonEditorFactory::~LineEditWithButtonEditorFactory()
 void LineEditWithButtonEditorFactory::connectPropertyManager(LineEditWithButtonPropertyManager* manager)
 {
     connect(manager, SIGNAL(valueChanged(QtProperty*, QString)), this, SLOT(slotPropertyChanged(QtProperty*, QString)));
+    connect(manager, SIGNAL(readOnlyChanged(QtProperty*, bool)), this, SLOT(slotReadOnlyChanged(QtProperty*, bool)));
 }
 
 QWidget* LineEditWithButtonEditorFactory::createEditor(LineEditWithButtonPropertyManager* manager, QtProperty* property, QWidget* parent)
@@ -139,6 +140,7 @@ QWidget* LineEditWithButtonEditorFactory::createEditor(LineEditWithButtonPropert
     LineEditWithButton* lineEdit = new LineEditWithButton(parent);
     lineEdit->setClearButtonVisible(false);
     lineEdit->setText(manager->value(property));
+    lineEdit->setReadOnly(manager->readOnly(property));
 
     auto it = data_->createdEditors.find(property);
     if (it == data_->createdEditors.end())
@@ -167,6 +169,7 @@ QWidget* LineEditWithButtonEditorFactory::createEditor(LineEditWithButtonPropert
 void LineEditWithButtonEditorFactory::disconnectPropertyManager(LineEditWithButtonPropertyManager* manager)
 {
     disconnect(manager, SIGNAL(valueChanged(QtProperty*, QString)), this, SLOT(slotPropertyChanged(QtProperty*, QString)));
+    disconnect(manager, SIGNAL(readOnlyChanged(QtProperty*, bool)), this, SLOT(slotReadOnlyChanged(QtProperty*, bool)));
 }
 
 void LineEditWithButtonEditorFactory::slotPropertyChanged(QtProperty* property, const QString& value)
@@ -177,7 +180,11 @@ void LineEditWithButtonEditorFactory::slotPropertyChanged(QtProperty* property, 
 
     for (auto editor : it.value()) {
         if (editor->text() != value)
+        {
+            editor->blockSignals(true);
             editor->setText(value);
+            editor->blockSignals(false);
+        }
     }
 }
 
@@ -214,6 +221,15 @@ void LineEditWithButtonEditorFactory::slotSetValue(const QString& value)
             manager->setValue(property, value);
             return;
         }
+}
+
+void LineEditWithButtonEditorFactory::slotReadOnlyChanged(QtProperty* property, bool readOnly)
+{
+    auto editors = data_->createdEditors.value(property);
+    for (auto editor : editors)
+    {
+        editor->setReadOnly(readOnly);
+    }
 }
 
 /**
@@ -280,7 +296,11 @@ void TextEditFactory::slotPropertyChanged(QtProperty* property, const QString& v
 
     for (QTextEdit* editor : it.value()) {
         if (editor->toPlainText() != value)
+        {
+            editor->blockSignals(true);
             editor->setText(value);
+            editor->blockSignals(false);
+        }
     }
 }
 

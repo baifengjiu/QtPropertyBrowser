@@ -47,6 +47,7 @@ protected Q_SLOTS:
     void slotPropertyChanged(QtProperty*, const QString&);
     void slotEditorDestroyed(QObject* object);
     void slotSetValue(const QString&);
+    void slotReadOnlyChanged(QtProperty*, bool);
 
 private:
     struct Impl;

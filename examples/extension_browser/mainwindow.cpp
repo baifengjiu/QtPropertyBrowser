@@ -51,10 +51,10 @@ void MainWindow::selectedChanged(const QModelIndex& index)
         addProperty(item3);
 
         QtProperty* item4 = lineManager_->addProperty("unit");
-
-        auto func = [](QString& value)->bool{
+        lineManager_->setReadOnly(item4, true);
+        auto func = [](QString& value)->bool {
             TestDialog dlg;
-            if(dlg.exec() == QDialog::Accepted)
+            if (dlg.exec() == QDialog::Accepted)
             {
                 value = dlg.getValue();
                 return true;

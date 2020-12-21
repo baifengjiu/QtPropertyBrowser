@@ -100,6 +100,7 @@ struct LineEditWithButtonPropertyManager::Data
 {
     std::function<bool(QString&)> func{ nullptr };
     QString val;
+    bool readOnly = false;
 };
 
 LineEditWithButtonPropertyManager::LineEditWithButtonPropertyManager(QObject* parent)
@@ -120,6 +121,17 @@ void LineEditWithButtonPropertyManager::addClickedHandle(QtProperty* property, s
 std::function<bool(QString&)> LineEditWithButtonPropertyManager::clickedHuandle(QtProperty* property)
 {
     return propertyToValue_.value(property).func;
+}
+
+void LineEditWithButtonPropertyManager::setReadOnly(QtProperty* property, bool readOnly)
+{
+    propertyToValue_[property].readOnly = readOnly;
+    emit readOnlyChanged(property, readOnly);
+}
+
+bool LineEditWithButtonPropertyManager::readOnly(QtProperty* property)
+{
+    return propertyToValue_.value(property).readOnly;
 }
 
 void LineEditWithButtonPropertyManager::setValue(QtProperty* property, const QString& val)

@@ -201,15 +201,14 @@ void CustomBrowserPrivate::propertyInserted(QtBrowserItem* index, QtBrowserItem*
     if (isCreateLable && newItem->widget)
         span = 1;
 
-    if (newItem->widget)
-        layout->addWidget(newItem->widget, row, span == 2 ? 0 : 1, 1, span);
     if (isCreateLable)
     {
-        if (span == 2)
-        {
-            newItem->label->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed));
-        }
-        layout->addWidget(newItem->label, row, 0, span, 1);
+        layout->addWidget(newItem->label, row, 0, 1, span);
+    }
+
+    if (newItem->widget)
+    {
+        layout->addWidget(newItem->widget, row, span == 2 ? 0 : 1, 1, span);
     }
 
     m_itemToIndex[newItem] = index;
@@ -224,6 +223,7 @@ void CustomBrowserPrivate::propertyRemoved(QtBrowserItem* index)
 
     m_indexToItem.remove(index);
     m_itemToIndex.remove(item);
+    m_lableVisible.remove(index->property());
 
     WidgetItem* parentItem = item->parent;
 
@@ -340,6 +340,7 @@ void CustomBrowserPrivate::slotEditorDestroyed()
     if (!m_widgetToItem.contains(editor))
         return;
     m_widgetToItem[editor]->widget = 0;
+
     m_widgetToItem.remove(editor);
     auto w = editor;
     if (auto proxy = editor->focusProxy())

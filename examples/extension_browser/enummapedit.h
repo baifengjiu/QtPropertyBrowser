@@ -9,7 +9,7 @@ typedef std::function<QStringList(QString)> ParseCallBackFunc;
 
 class QMenu;
 class QLineEdit;
-class QPushButton;
+class QToolButton;
 class QButtonGroup;
 class QAbstractButton;
 
@@ -38,7 +38,7 @@ signals:
 protected:
     bool eventFilter(QObject* watched, QEvent* event) override;
     void paintEvent(QPaintEvent* e) override;
-    void resizeEvent(QResizeEvent* e) override;
+
 private:
     void initContent();
     void initLayout();
@@ -51,7 +51,7 @@ private slots:
 
 private:
     QLineEdit* m_leContent;
-    QPushButton* m_btnDropDown;
+    QToolButton* m_btnDropDown;
     QMenu* m_menu;
     CallBackFunc m_showCallBackFunc;
     ParseCallBackFunc m_parseCallBackFunc;

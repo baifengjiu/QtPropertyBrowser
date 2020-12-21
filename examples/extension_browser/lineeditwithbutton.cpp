@@ -11,7 +11,7 @@ LineEditWithButton::LineEditWithButton(QWidget* parent)
     m_btn->setObjectName("LineEdit_Btn");
     m_btn->setCursor(Qt::ArrowCursor);
     m_btn->setFlat(true);
-    m_btn->setText(QStringLiteral("···"));
+    // m_btn->setText(QStringLiteral("..."));
     m_btn->setWindowOpacity(1);
     m_btn->setFixedSize(16, 16);
     m_btn->setMaximumWidth(16);

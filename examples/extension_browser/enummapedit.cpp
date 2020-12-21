@@ -1,6 +1,6 @@
 #include "enummapedit.h"
 
-#include <QPushButton>
+#include <QToolButton>
 #include <QLineEdit>
 #include <QMenu>
 #include <QHBoxLayout>
@@ -94,7 +94,7 @@ bool EnumMapEdit::eventFilter(QObject* watched, QEvent* event)
     else if (watched == m_leContent && event->type() == QEvent::Resize)
     {
         auto resizeEvent = static_cast<QResizeEvent*>(event);
-        m_btnDropDown->setFixedHeight(resizeEvent->size().height());
+        m_btnDropDown->setFixedHeight(resizeEvent->size().height() - 2);
     }
 
     return QWidget::eventFilter(watched, event);
@@ -109,12 +109,6 @@ void EnumMapEdit::paintEvent(QPaintEvent* e)
     painter.drawPrimitive(QStyle::PE_Widget, opt);
 
     QWidget::paintEvent(e);
-}
-
-void EnumMapEdit::resizeEvent(QResizeEvent* e)
-{
-    m_btnDropDown->setFixedHeight(e->size().height() - 2);
-    QWidget::resizeEvent(e);
 }
 
 void EnumMapEdit::setDropDownData(QMap<int, QString> enumMaps)
@@ -148,9 +142,9 @@ void EnumMapEdit::setDropDownData(QMap<int, QString> enumMaps)
 
 void EnumMapEdit::initContent()
 {
-    m_btnDropDown = new QPushButton(this);
+    m_btnDropDown = new QToolButton(this);
     m_btnDropDown->setObjectName("LineEdit_Drop");
-    m_btnDropDown->setText(QStringLiteral("···"));
+    // m_btnDropDown->setText(QStringLiteral("···"));
     m_btnDropDown->installEventFilter(this);
     m_leContent = new QLineEdit(this);
     m_leContent->installEventFilter(this);
@@ -170,7 +164,7 @@ void EnumMapEdit::initContent()
 
     m_parseCallBackFunc = [this](QString data)
     {
-        QStringList dataList = data.split(m_sep, QString::SkipEmptyParts);
+        QStringList dataList = data.split(m_sep, Qt::SkipEmptyParts);
         return dataList;
     };
 }
@@ -196,7 +190,7 @@ void EnumMapEdit::initLayout()
 
 void EnumMapEdit::initConnect()
 {
-    connect(m_btnDropDown, &QPushButton::clicked, m_menu, &QMenu::show);
+    connect(m_btnDropDown, &QToolButton::clicked, m_menu, &QMenu::show);
     connect(m_buttonGroup, SIGNAL(buttonClicked(QAbstractButton*)), this, SLOT(slotCheckBoxFunction(QAbstractButton*)));
 }
 
@@ -246,8 +240,8 @@ void EnumMapEdit::subMenuActionShow()
             return false;
         }
     };
-    qSort(selectActionList.begin(), selectActionList.end(), compareFunc);
-    qSort(unselectActionList.begin(), unselectActionList.end(), compareFunc);
+    std::sort(selectActionList.begin(), selectActionList.end(), compareFunc);
+    std::sort(unselectActionList.begin(), unselectActionList.end(), compareFunc);
 
     m_menu->clear();
     m_menu->addActions(selectActionList);
@@ -315,6 +309,6 @@ void EnumMapEdit::setValues(QList<int> values)
     m_leContent->setText(m_showCallBackFunc(dataList));
     if (!m_menu->isHidden())
     {
-       // subMenuActionShow();
+        // subMenuActionShow();
     }
 }

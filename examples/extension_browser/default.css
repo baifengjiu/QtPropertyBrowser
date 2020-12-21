@@ -1,4 +1,4 @@
-TitleButton {
+CustomBrowser TitleButton {
     height: 26px;
     background: #E5E5E5;
     color: #262626;
@@ -9,11 +9,11 @@ TitleButton {
     border-bottom: 1px solid #C0C0C0;
 }
 
-TitleButton::branch:open {
+CustomBrowser TitleButton::branch:open {
     /*image: url(:/images/tree-open-light.png);*/
 }
 
-TitleButton::branch:close {
+CustomBrowser TitleButton::branch:close {
     /*image: url(:/images/tree-close-light.png);*/
 }
 
@@ -37,38 +37,45 @@ CustomBrowser QWidget#TipInfoWidget > QTextBrowser {
     border: none;
 }
 
-LineEditWithButton #LineEdit_Btn {
-    image: url(:/images/preferenceOpenFile.png);
+CustomBrowser LineEditWithButton {
+    border: 1px solid #8591A2;
 }
 
-LineEditWithButton {
-    border: 1px solid black;
+CustomBrowser LineEditWithButton:hover {
+    border: 1px solid #1e1e1e;
 }
 
-#ValueWidget[level="None"] {
+CustomBrowser LineEditWithButton #LineEdit_Btn {
+    background-color: #ffffff;
+    border: none;
+    border-left: 1px solid #8591A2;
+    image: url(:/images/more.png);
+}
+
+CustomBrowser #ValueWidget[level="None"] {
     border: 1px solid #808080;
 }
 
-#ValueWidget[level="Error"] {
+CustomBrowser #ValueWidget[level="Error"] {
     border: 1px solid #ff0000;
 }
 
-EnumMapEdit #LineEdit_Item {
+CustomBrowser EnumMapEdit #LineEdit_Item {
     background-color: #FFFFFF;
     color: #686868;
 }
 
-EnumMapEdit #LineEdit_Item:hover {
+CustomBrowser EnumMapEdit #LineEdit_Item:hover {
     color: #000000;
 }
 
-EnumMapEdit #LineEdit_DropMenu {
+CustomBrowser EnumMapEdit #LineEdit_DropMenu {
     background-color: #FFFFFF;
 }
 
-EnumMapEdit #LineEdit_Drop {
-    background-color: #FFFFFF;
-    width: 10px;
-    height: 10px;
-    border-radius: 4px;
+CustomBrowser EnumMapEdit #LineEdit_Drop {
+    background-color: #ffffff;
+    border: none;
+    border-left: 1px solid #8591A2;
+    image: url(:/images/more.png);
 }
