@@ -29,6 +29,7 @@ public:
     }
 
     void setTipInfo(QtProperty* property, CustomBrowser::TipType type);
+    void setTipStyle(QWidget* w, CustomBrowser::TipType type);
     void setLableVisible(QtProperty* property, bool isVisible);
 
     void slotEditorDestroyed();
@@ -66,6 +67,7 @@ private:
     QMap<QObject*, WidgetItem*> m_titleToItem;
     QMap<QWidget*, QtBrowserItem*> m_focusProxyToIndex;
     QMap<QtProperty*, bool> m_lableVisible;
+    QMap<QtProperty*, CustomBrowser::TipType> m_tipType;
     QGridLayout* m_mainLayout = nullptr;
     QList<WidgetItem*> m_children;
     QList<WidgetItem*> m_recreateQueue;
@@ -183,6 +185,12 @@ void CustomBrowserPrivate::propertyInserted(QtBrowserItem* index, QtBrowserItem*
 
     newItem->widget = createEditor(index->property(), parentWidget);
     if (newItem->widget) {
+        auto type = m_tipType.value(index->property());
+        if (type != CustomBrowser::TipType::None)
+        {
+            setTipStyle(newItem->widget, type);
+        }
+        m_tipType.remove(index->property());
         QObject::connect(newItem->widget, SIGNAL(destroyed()), q_ptr, SLOT(slotEditorDestroyed()));
         m_widgetToItem[newItem->widget] = newItem;
         newItem->widget->setObjectName("ValueWidget");
@@ -224,6 +232,7 @@ void CustomBrowserPrivate::propertyRemoved(QtBrowserItem* index)
     m_indexToItem.remove(index);
     m_itemToIndex.remove(item);
     m_lableVisible.remove(index->property());
+    m_tipType.remove(index->property());
 
     WidgetItem* parentItem = item->parent;
 
@@ -303,28 +312,37 @@ void CustomBrowserPrivate::setTipInfo(QtProperty* property, CustomBrowser::TipTy
         WidgetItem* w = m_indexToItem.value(item);
         if (w && w->widget)
         {
-            w->widget->style()->unpolish(w->widget);
-            switch (type)
-            {
-                case CustomBrowser::None:
-                    w->widget->setProperty("level", "None");
-                    break;
-                case CustomBrowser::Info:
-                    w->widget->setProperty("level", "Info");
-                    break;
-                case CustomBrowser::Warring:
-                    w->widget->setProperty("level", "Warring");
-                    break;
-                case CustomBrowser::Error:
-                    w->widget->setProperty("level", "Error");
-                    break;
-                default:
-                    w->widget->setProperty("level", "None");
-                    break;
-            }
-            w->widget->style()->polish(w->widget);
+            setTipStyle(w->widget, type);
         }
     }
+    if (items.empty())
+    {
+        m_tipType.insert(property, type);
+    }
+}
+
+void CustomBrowserPrivate::setTipStyle(QWidget* w, CustomBrowser::TipType type)
+{
+    w->style()->unpolish(w);
+    switch (type)
+    {
+        case CustomBrowser::None:
+            w->setProperty("level", "None");
+            break;
+        case CustomBrowser::Info:
+            w->setProperty("level", "Info");
+            break;
+        case CustomBrowser::Warring:
+            w->setProperty("level", "Warring");
+            break;
+        case CustomBrowser::Error:
+            w->setProperty("level", "Error");
+            break;
+        default:
+            w->setProperty("level", "None");
+            break;
+    }
+    w->style()->polish(w);
 }
 
 void CustomBrowserPrivate::setLableVisible(QtProperty* property, bool isVisible)

@@ -160,7 +160,7 @@ QWidget* LineEditWithButtonEditorFactory::createEditor(LineEditWithButtonPropert
         if (func(value))
         {
             lineEdit->setText(value);
-            emit manager->valueChanged(property, value);
+            manager->setValue(property, value);
         }
     });
     return lineEdit;

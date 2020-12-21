@@ -41,6 +41,8 @@ void MainWindow::selectedChanged(const QModelIndex& index)
         addProperty(item1);
 
         QtProperty* item2 = stringManager_->addProperty("code");
+        item2->setToolTip(tr("The Code cannot be empty or more than 64 chars. Failed to edit parameter."));
+        ui->custombrowser->setTipInfo(item2, CustomBrowser::TipType::Error);
         stringManager_->setValue(item2, currentItem_->code);
         root1_->addSubProperty(item2);
         addProperty(item2);
