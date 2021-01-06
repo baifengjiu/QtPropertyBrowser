@@ -1,9 +1,8 @@
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
-#include "qteditorfactory.h"
-#include "customeditorfactory.h"
 #include "TestTableModel.h"
 #include "TestDialog.h"
+#include <qteditorfactory.h>
 #include <QAbstractItemDelegate>
 #include <QAction>
 
@@ -54,6 +53,7 @@ void MainWindow::selectedChanged(const QModelIndex& index)
 
         QtProperty* item4 = lineManager_->addProperty("unit");
         lineManager_->setReadOnly(item4, true);
+        lineManager_->setValue(item4,currentItem_->unit);
         auto func = [](QString& value)->bool {
             TestDialog dlg;
             if (dlg.exec() == QDialog::Accepted)
@@ -131,6 +131,13 @@ void MainWindow::selectedChanged(const QModelIndex& index)
         QAction* addAct = new QAction(QIcon(":/images/addItem.png"), "");
         QAction* delAct = new QAction(QIcon(":/images/deleteItem.png"), "");
         connect(addAct, &QAction::triggered, model, &TestTableModel::addRow);
+        connect(delAct, &QAction::triggered, [model, item9, this](){
+            auto index = tableManager_->selectedIndex(item9);
+            if (index.isValid())
+            {
+                model->removeRow(index.row());
+            }
+        });
         actions.append(addAct);
         actions.append(delAct);
 
@@ -286,6 +293,7 @@ void MainWindow::init()
     connect(intManager_, SIGNAL(valueChanged(QtProperty*, int)), this, SLOT(valueChanged(QtProperty*, int)));
     connect(doubleManager_, SIGNAL(valueChanged(QtProperty*, double)), this, SLOT(valueChanged(QtProperty*, double)));
     connect(stringManager_, SIGNAL(valueChanged(QtProperty*, const QString&)), this, SLOT(valueChanged(QtProperty*, const QString&)));
+    connect(lineManager_, SIGNAL(valueChanged(QtProperty*, const QString&)), this, SLOT(valueChanged(QtProperty*, const QString&)));
     connect(enumManager_, SIGNAL(valueChanged(QtProperty*, int)), this, SLOT(valueChanged(QtProperty*, int)));
     connect(textManager_, SIGNAL(valueChanged(QtProperty*, const QString&)), this, SLOT(valueChanged(QtProperty*, const QString&)));
     connect(enumMapManager_, SIGNAL(valueChanged(QtProperty*, const QList<int>&)), this, SLOT(valueChanged(QtProperty*, const QList<int>&)));

@@ -8,7 +8,9 @@ int main(int argc, char** argv)
 
     QString qss;
 
-    QFile file(":/qss/default.css");
+    //:/css/Resources/blue.css
+    //:/css/Resources/dark.css
+    QFile file(":/css/Resources/blue.css");
     if (file.open(QIODevice::ReadOnly))
     {
         qss.append(file.readAll());

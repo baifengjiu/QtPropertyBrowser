@@ -1,12 +1,12 @@
 ﻿#pragma once
-#include <qtpropertybrowser.h>
+#include "qtpropertybrowser.h"
 #include <QAction>
 
 QT_BEGIN_NAMESPACE
 
 class CustomBrowserPrivate;
 
-class CustomBrowser : public QtAbstractPropertyBrowser
+class QT_QTPROPERTYBROWSER_EXPORT CustomBrowser : public QtAbstractPropertyBrowser
 {
     Q_OBJECT
 public:
@@ -33,7 +33,7 @@ public:
      * @brief:     设置当前提示类型
      * @param[in]: QtProperty * property
      * @param[in]: TipType type 提示信息类型
-     * @return:    
+     * @return:
      */
     void setTipInfo(QtProperty* property, TipType type);
 

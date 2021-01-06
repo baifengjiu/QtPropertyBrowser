@@ -22,11 +22,13 @@ public:
 
 public Q_SLOTS:
     void addRow();
+    void removeRow(int row);
 
 private:
     QStringList m_headers;
     QList<QVariantList> m_cells;
 };
+
 
 class ValueDelegate : public QStyledItemDelegate
 {

@@ -8,6 +8,10 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_DEBUG_POSTFIX "D")
 
 set(_SRCS
+  private/enummapedit.cpp
+  private/lineeditwithbutton.cpp
+  private/titlebutton.cpp
+  custombrowser.cpp
   qtbuttonpropertybrowser.cpp
   qteditorfactory.cpp
   qtgroupboxpropertybrowser.cpp
@@ -18,7 +22,7 @@ set(_SRCS
   qtvariantproperty.cpp
   )
 
-file(GLOB _IMPL_HDRS *.h)
+file(GLOB_RECURSE _IMPL_HDRS *.h)
 file(GLOB _PUBLIC_HDRS Qt*)
 
 set(_UI_FORMS
@@ -33,16 +37,19 @@ QT5_ADD_RESOURCES(_QRC_SRCS ${_RESOURCES})
 
 set(TARGET_NAME ${PROJECT_NAME})
 
-add_library(${TARGET_NAME} SHARED
+IF(BUILD_SHARED)
+    set(BUILD_TYPE SHARED)
+    add_definitions(-DQT_QTPROPERTYBROWSER_EXPORT)
+ELSE()
+    set(BUILD_TYPE STATIC)
+ENDIF()
+
+add_library(${TARGET_NAME} ${BUILD_TYPE}
   ${_SRCS}
   ${_UI_SRCS}
   ${_QRC_SRCS}
   ${_IMPL_HDRS}
   )
-
-IF (BUILD_SHARED)
-    add_definitions(-DQT_QTPROPERTYBROWSER_EXPORT)
-ENDIF()
 
 target_link_libraries(${TARGET_NAME} Qt5::Widgets)
 

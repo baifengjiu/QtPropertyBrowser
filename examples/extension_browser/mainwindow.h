@@ -1,8 +1,7 @@
 #pragma once
 
 #include "tablemodel.h"
-#include "custompropertymanager.h"
-#include "qtpropertymanager.h"
+#include <qtpropertymanager.h>
 #include <QtProperty>
 #include <QMainWindow>
 #include <QMap>

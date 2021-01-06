@@ -1,4 +1,4 @@
-<RCC version="1.0">
+<RCC>
     <qresource prefix="/qt-project.org/qtpropertybrowser">
         <file>images/cursor-arrow.png</file>
         <file>images/cursor-busy.png</file>
@@ -19,5 +19,12 @@
         <file>images/cursor-wait.png</file>
         <file>images/cursor-whatsthis.png</file>
     </qresource>
+    <qresource prefix="/css">
+        <file>Resources/blue.css</file>
+        <file>Resources/dark.css</file>
+    </qresource>
+    <qresource prefix="/qtpropertybrowser">
+        <file>images/blue/more.png</file>
+        <file>images/dark/more.png</file>
+    </qresource>
 </RCC>
-  

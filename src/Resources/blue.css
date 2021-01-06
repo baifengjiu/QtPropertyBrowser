@@ -5,7 +5,6 @@ CustomBrowser TitleButton {
     padding: 0px;
     margin: 0px;
     border: 0px;
-    border-radius: 0px;
     border-bottom: 1px solid #C0C0C0;
 }
 
@@ -49,7 +48,7 @@ CustomBrowser LineEditWithButton #LineEdit_Btn {
     background-color: #ffffff;
     border: none;
     border-left: 1px solid #8591A2;
-    image: url(:/images/more.png);
+    image: url(:/qtpropertybrowser/images/blue/more.png);
 }
 
 CustomBrowser #ValueWidget[level="None"] {
@@ -77,5 +76,5 @@ CustomBrowser EnumMapEdit #LineEdit_Drop {
     background-color: #ffffff;
     border: none;
     border-left: 1px solid #8591A2;
-    image: url(:/images/more.png);
+    image: url(:/qtpropertybrowser/images/blue/more.png);
 }

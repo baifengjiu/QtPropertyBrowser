@@ -41,6 +41,8 @@
 #define QTEDITORFACTORY_H
 
 #include "qtpropertymanager.h"
+#include <QAbstractTableModel>
+#include <QScopedPointer>
 
 QT_BEGIN_NAMESPACE
 
@@ -389,6 +391,115 @@ private:
     Q_PRIVATE_SLOT(d_func(), void slotEditorDestroyed(QObject *))
     Q_PRIVATE_SLOT(d_func(), void slotSetValue(const QFont &))
 };
+
+
+/**
+ * TableEditorFactory
+ */
+class QT_QTPROPERTYBROWSER_EXPORT TableEditorFactory : public QtAbstractEditorFactory<TablePropertyManager>
+{
+    Q_OBJECT
+public:
+    TableEditorFactory(QObject* parent = 0);
+    ~TableEditorFactory();
+
+protected:
+    void connectPropertyManager(TablePropertyManager* manager) override;
+    QWidget* createEditor(TablePropertyManager* manager, QtProperty* property, QWidget* parent) override;
+    void disconnectPropertyManager(TablePropertyManager* manager) override;
+
+protected Q_SLOTS:
+    void slotEditorDestroyed(QObject* object);
+
+private:
+    struct Impl;
+    QScopedPointer<Impl> data_;
+ };
+
+/**
+ * LineEditWithButtonEditorFactory
+ */
+class QT_QTPROPERTYBROWSER_EXPORT LineEditWithButtonEditorFactory : public QtAbstractEditorFactory<LineEditWithButtonPropertyManager>
+{
+    Q_OBJECT
+public:
+    LineEditWithButtonEditorFactory(QObject* parent = 0);
+    ~LineEditWithButtonEditorFactory();
+
+protected:
+    void connectPropertyManager(LineEditWithButtonPropertyManager* manager) override;
+    QWidget* createEditor(LineEditWithButtonPropertyManager* manager, QtProperty* property, QWidget* parent) override;
+    void disconnectPropertyManager(LineEditWithButtonPropertyManager* manager) override;
+
+protected Q_SLOTS:
+    void slotPropertyChanged(QtProperty*, const QString&);
+    void slotSetValue(const QString&);
+    void slotReadOnlyChanged(QtProperty*, bool);
+    void slotEditorDestroyed(QObject* object);
+
+private:
+    struct Impl;
+    QScopedPointer<Impl> data_;
+};
+
+/**
+ * TextEditFactory
+ */
+class QT_QTPROPERTYBROWSER_EXPORT TextEditFactory : public QtAbstractEditorFactory<TextEditPropertyManager>
+{
+    Q_OBJECT
+public:
+    TextEditFactory(QObject* parent = 0);
+    ~TextEditFactory();
+
+protected:
+    void connectPropertyManager(TextEditPropertyManager* manager) override;
+    QWidget* createEditor(TextEditPropertyManager* manager, QtProperty* property, QWidget* parent) override;
+    void disconnectPropertyManager(TextEditPropertyManager* manager) override;
+
+private Q_SLOTS:
+    void slotPropertyChanged(QtProperty*, const QString&);
+    void slotSetValue(const QString&);
+
+    void slotEditorDestroyed(QObject* object);
+
+private:
+    struct Impl;
+    QScopedPointer<Impl> data_;
+};
+
+/**
+ * EnumMapFactory
+ */
+class QT_QTPROPERTYBROWSER_EXPORT EnumMapFactory : public QtAbstractEditorFactory<EnumMapPropertyManager>
+{
+    Q_OBJECT
+public:
+    EnumMapFactory(QObject* parent = 0);
+    ~EnumMapFactory();
+
+protected:
+    void connectPropertyManager(EnumMapPropertyManager* manager) override;
+    QWidget* createEditor(EnumMapPropertyManager* manager, QtProperty* property, QWidget* parent) override;
+    void disconnectPropertyManager(EnumMapPropertyManager* manager) override;
+
+private Q_SLOTS:
+    void slotPropertyChanged(QtProperty*, const QList<int>& value);
+    void slotSetValue(const QList<int>& value);
+    void slotEnumNamesChanged(QtProperty* property, const QMap<int, QString>& names);
+    void slotSepChanged(QtProperty* property, char sep);
+
+    void slotEditorDestroyed(QObject* object);
+
+private:
+    struct Impl;
+    QScopedPointer<Impl> data_;
+};
+
+
+
+
+
 
 QT_END_NAMESPACE
 

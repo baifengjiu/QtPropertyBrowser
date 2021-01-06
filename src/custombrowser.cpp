@@ -1,5 +1,5 @@
 ﻿#include "custombrowser.h"
-#include "titlebutton.h"
+#include "private/titlebutton.h"
 #include <QMap>
 #include <QLabel>
 #include <QWidget>
@@ -12,7 +12,7 @@
 
 QT_BEGIN_NAMESPACE
 
-class CustomBrowserPrivate
+class  CustomBrowserPrivate
 {
     CustomBrowser* q_ptr;
     Q_DECLARE_PUBLIC(CustomBrowser)

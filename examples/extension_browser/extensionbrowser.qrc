@@ -1,13 +1,9 @@
 <RCC>
-    <qresource prefix="/qss">
-        <file>default.css</file>
-    </qresource>
     <qresource prefix="/">
         <file>images/tree-close-light.png</file>
         <file>images/tree-open-light.png</file>
         <file>images/addItem.png</file>
         <file>images/deleteItem.png</file>
         <file>images/control-button-more.png</file>
-        <file>images/more.png</file>
     </qresource>
 </RCC>

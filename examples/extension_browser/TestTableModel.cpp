@@ -85,6 +85,18 @@ int TestTableModel::columnCount(const QModelIndex& parent) const
     return m_headers.size();
 }
 
+void TestTableModel::removeRow(int row)
+{
+    if (row > rowCount())
+    {
+        return;
+    }
+
+    beginRemoveRows(QModelIndex(),row,row);
+    m_cells.removeAt(row);
+    endRemoveRows();
+}
+
 void TestTableModel::addRow()
 {
     int row = rowCount();
